@@ -125,19 +125,30 @@ export class HashCalculator {
     try {
       // Parse parameters with better error handling
       const maxValueStr = params.maxValue.trim();
+      
+      // Handle both hex and decimal formats
       if (maxValueStr.startsWith('0x')) {
         this.maxValue = BigInt(maxValueStr);
-      } else {
-        // If it's a decimal number, convert to BigInt
+      } else if (/^\d+$/.test(maxValueStr)) {
+        // Pure decimal number
         this.maxValue = BigInt(maxValueStr);
+      } else {
+        throw new Error(`Invalid max_value format: ${maxValueStr}. Use decimal number or hex (0x...)`);
       }
       
-      this.prevHash = this.normalizeHexString(params.prevHash.trim());
+      // Normalize prev_hash
+      const prevHashStr = params.prevHash.trim();
+      if (!prevHashStr.startsWith('0x')) {
+        throw new Error(`prev_hash must start with 0x: ${prevHashStr}`);
+      }
+      this.prevHash = this.normalizeHexString(prevHashStr);
+      
       this.maxSolutions = params.maxSolutions;
       this.searchMethod = params.searchMethod;
       
       console.log('Calculation parameters:', {
         maxValue: this.maxValue.toString(),
+        maxValueHex: '0x' + this.maxValue.toString(16),
         prevHash: this.prevHash,
         maxSolutions: this.maxSolutions,
         searchMethod: this.searchMethod

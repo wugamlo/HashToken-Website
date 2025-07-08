@@ -46,20 +46,21 @@ export default function HashCalculator() {
       return;
     }
 
-    // Validate hex format
+    // Validate max_value format (decimal or hex)
     if (!maxValue.match(/^0x[0-9a-fA-F]+$/) && !maxValue.match(/^[0-9]+$/)) {
       toast({
         title: "Invalid Max Value",
-        description: "Max value must be a valid number or hex string",
+        description: "Max value must be a decimal number or hex string (0x...)",
         variant: "destructive"
       });
       return;
     }
 
-    if (!prevHash.match(/^0x[0-9a-fA-F]{64}$/)) {
+    // Validate prev_hash format (must be hex with 0x prefix)
+    if (!prevHash.match(/^0x[0-9a-fA-F]+$/)) {
       toast({
-        title: "Invalid Previous Hash",
-        description: "Previous hash must be a valid 64-character hex string starting with 0x",
+        title: "Invalid Previous Hash", 
+        description: "Previous hash must be a hex string starting with 0x",
         variant: "destructive"
       });
       return;
@@ -195,14 +196,14 @@ export default function HashCalculator() {
 
               <Button
                 onClick={() => {
-                  setMaxValue("57896044618658097711785492504343953926634992332820282019728792003956564819967");
-                  setPrevHash("0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+                  setMaxValue("191655064516856231946315918192061657504230449685856907525680910693416865540584");
+                  setPrevHash("0x2d3875610ea43ff64255da32b982a2359d6c4853314898c1ccebc91ee8a00ee4");
                 }}
                 variant="outline"
                 className="border-slate-600 text-slate-300"
               >
                 <Settings className="mr-2" size={16} />
-                Use Sample Values
+                Use Your Contract Values
               </Button>
             </div>
           </CardContent>
