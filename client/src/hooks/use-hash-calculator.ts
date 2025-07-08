@@ -35,6 +35,12 @@ export function useHashCalculator() {
       await calculatorRef.current.startCalculation(params);
     } catch (error) {
       console.error('Calculation error:', error);
+      // Show user-friendly error message
+      if (error instanceof Error) {
+        alert(`Calculation failed: ${error.message}`);
+      } else {
+        alert('Calculation failed due to an unknown error. Please check your input values.');
+      }
     } finally {
       setIsCalculating(false);
     }

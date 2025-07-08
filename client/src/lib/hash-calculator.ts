@@ -75,9 +75,28 @@ export class HashCalculator {
   }
 
   private isValidSolution(calculatedHash: string, maxValue: BigInt): boolean {
-    // Convert hash to BigInt for comparison
-    const hashValue = BigInt(calculatedHash);
-    return hashValue > maxValue;
+    try {
+      // Convert hash to BigInt for comparison
+      const hashValue = BigInt(calculatedHash);
+      // For successful minting, hash must be <= max_value (contract throws if hash > max_value)
+      const isValid = hashValue <= maxValue;
+      
+      // Debug logging for first few attempts
+      if (this.attempts <= 5) {
+        console.log(`Validation attempt ${this.attempts}:`, {
+          calculatedHash,
+          hashValue: hashValue.toString(),
+          maxValue: maxValue.toString(),
+          isValid,
+          note: 'Need hash <= max_value for successful mint'
+        });
+      }
+      
+      return isValid;
+    } catch (error) {
+      console.error('Hash validation error:', error);
+      return false;
+    }
   }
 
   private updateProgress(): void {
@@ -103,11 +122,30 @@ export class HashCalculator {
     this.attempts = 0;
     this.solutions = [];
     
-    // Parse parameters
-    this.maxValue = BigInt(params.maxValue.startsWith('0x') ? params.maxValue : params.maxValue);
-    this.prevHash = this.normalizeHexString(params.prevHash);
-    this.maxSolutions = params.maxSolutions;
-    this.searchMethod = params.searchMethod;
+    try {
+      // Parse parameters with better error handling
+      const maxValueStr = params.maxValue.trim();
+      if (maxValueStr.startsWith('0x')) {
+        this.maxValue = BigInt(maxValueStr);
+      } else {
+        // If it's a decimal number, convert to BigInt
+        this.maxValue = BigInt(maxValueStr);
+      }
+      
+      this.prevHash = this.normalizeHexString(params.prevHash.trim());
+      this.maxSolutions = params.maxSolutions;
+      this.searchMethod = params.searchMethod;
+      
+      console.log('Calculation parameters:', {
+        maxValue: this.maxValue.toString(),
+        prevHash: this.prevHash,
+        maxSolutions: this.maxSolutions,
+        searchMethod: this.searchMethod
+      });
+    } catch (error) {
+      console.error('Parameter parsing error:', error);
+      throw new Error(`Invalid parameters: ${error.message}`);
+    }
 
     // Start calculation loop
     return new Promise((resolve) => {
@@ -122,32 +160,37 @@ export class HashCalculator {
         for (let i = 0; i < batchSize && this.isRunning; i++) {
           this.attempts++;
 
-          // Generate input value based on search method
-          const inputValue = this.searchMethod === 'random' 
-            ? this.generateRandomBytes32()
-            : this.generateIncrementalValue(this.attempts);
+          try {
+            // Generate input value based on search method
+            const inputValue = this.searchMethod === 'random' 
+              ? this.generateRandomBytes32()
+              : this.generateIncrementalValue(this.attempts);
 
-          // Calculate hash
-          const calculatedHash = this.calculateHash(inputValue, this.prevHash);
+            // Calculate hash
+            const calculatedHash = this.calculateHash(inputValue, this.prevHash);
 
-          // Check if valid
-          if (this.isValidSolution(calculatedHash, this.maxValue)) {
-            const solution: HashSolution = {
-              inputValue,
-              calculatedHash,
-              hashValue: calculatedHash,
-              isValid: true
-            };
-            
-            this.solutions.push(solution);
+            // Check if valid
+            if (this.isValidSolution(calculatedHash, this.maxValue)) {
+              const solution: HashSolution = {
+                inputValue,
+                calculatedHash,
+                hashValue: calculatedHash,
+                isValid: true
+              };
+              
+              this.solutions.push(solution);
 
-            // Stop if we found enough solutions
-            if (this.solutions.length >= this.maxSolutions) {
-              this.isRunning = false;
-              this.updateProgress();
-              resolve();
-              return;
+              // Stop if we found enough solutions
+              if (this.solutions.length >= this.maxSolutions) {
+                this.isRunning = false;
+                this.updateProgress();
+                resolve();
+                return;
+              }
             }
+          } catch (error) {
+            console.error('Hash calculation error:', error);
+            // Continue with next attempt
           }
 
           // Stop if we've tried too many attempts

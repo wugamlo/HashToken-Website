@@ -115,14 +115,14 @@ export default function HashCalculator() {
                 <Label htmlFor="maxValue">Max Value</Label>
                 <Input
                   id="maxValue"
-                  placeholder="Enter max_value from contract"
+                  placeholder="e.g., 57896044618658097711785492504343953926634992332820282019728792003956564819967"
                   value={maxValue}
                   onChange={(e) => setMaxValue(e.target.value)}
                   className="bg-slate-900 border-slate-600 text-white"
                 />
                 <p className="text-xs text-slate-400 flex items-center gap-1">
                   <Info size={12} />
-                  Get this value by calling max_value() on the contract
+                  Get this value by calling max_value() on the contract (decimal or hex format)
                 </p>
               </div>
 
@@ -130,14 +130,14 @@ export default function HashCalculator() {
                 <Label htmlFor="prevHash">Previous Hash</Label>
                 <Input
                   id="prevHash"
-                  placeholder="Enter prev_hash from contract"
+                  placeholder="e.g., 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
                   value={prevHash}
                   onChange={(e) => setPrevHash(e.target.value)}
                   className="bg-slate-900 border-slate-600 text-white"
                 />
                 <p className="text-xs text-slate-400 flex items-center gap-1">
                   <Info size={12} />
-                  Get this value by calling prev_hash() on the contract
+                  Get this value by calling prev_hash() on the contract (64-character hex string)
                 </p>
               </div>
             </div>
@@ -192,6 +192,18 @@ export default function HashCalculator() {
                   Stop
                 </Button>
               )}
+
+              <Button
+                onClick={() => {
+                  setMaxValue("57896044618658097711785492504343953926634992332820282019728792003956564819967");
+                  setPrevHash("0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+                }}
+                variant="outline"
+                className="border-slate-600 text-slate-300"
+              >
+                <Settings className="mr-2" size={16} />
+                Use Sample Values
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -292,7 +304,7 @@ export default function HashCalculator() {
                         <span className="text-slate-400">Verification:</span>
                         <span className="ml-2 text-green-400 flex items-center gap-1">
                           <CheckCircle size={12} />
-                          Hash {'>'} Max Value
+                          Hash ≤ Max Value
                         </span>
                       </div>
                     </div>
@@ -342,9 +354,10 @@ export default function HashCalculator() {
               </h4>
               <ul className="space-y-1 text-sm text-slate-300">
                 <li>• Ensure max_value and prev_hash are current values from the contract</li>
-                <li>• The calculation may take time depending on current difficulty</li>
+                <li>• The calculation finds values where hash ≤ max_value (valid for minting)</li>
                 <li>• Use the calculated bytes32 value directly in the mint() function</li>
                 <li>• Values are calculated using keccak256 (same as contract's sha3)</li>
+                <li>• Click "Use Sample Values" to test with example data</li>
               </ul>
             </div>
           </CardContent>
