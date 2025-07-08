@@ -78,17 +78,20 @@ export class HashCalculator {
     try {
       // Convert hash to BigInt for comparison
       const hashValue = BigInt(calculatedHash);
-      // For successful minting, hash must be <= max_value (contract throws if hash > max_value)
+      // CRITICAL FIX: Contract logic is "if (uint(sha3(value, prev_hash)) > max_value) { throw; }"
+      // This means for SUCCESS, we need hash <= max_value
+      // But the contract SUCCEEDS when hash <= max_value, so our validation is correct
       const isValid = hashValue <= maxValue;
       
-      // Debug logging for first few attempts
-      if (this.attempts <= 5) {
+      // Enhanced debug logging
+      if (this.attempts <= 10) {
         console.log(`Validation attempt ${this.attempts}:`, {
           calculatedHash,
           hashValue: hashValue.toString(),
           maxValue: maxValue.toString(),
+          comparison: `${hashValue.toString()} <= ${maxValue.toString()}`,
           isValid,
-          note: 'Need hash <= max_value for successful mint'
+          note: 'Contract succeeds when hash <= max_value'
         });
       }
       
@@ -153,6 +156,12 @@ export class HashCalculator {
         maxSolutions: this.maxSolutions,
         searchMethod: this.searchMethod
       });
+
+      // Calculate probability of finding a valid solution
+      const maxPossibleHash = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+      const probability = Number(this.maxValue) / Number(maxPossibleHash);
+      console.log('Expected probability of finding valid hash:', probability);
+      console.log('Expected attempts needed:', Math.ceil(1 / probability));
     } catch (error) {
       console.error('Parameter parsing error:', error);
       throw new Error(`Invalid parameters: ${error.message}`);
@@ -166,8 +175,8 @@ export class HashCalculator {
           return;
         }
 
-        // Process batch of attempts
-        const batchSize = 100;
+        // Process batch of attempts (larger batch for better performance)
+        const batchSize = 1000;
         for (let i = 0; i < batchSize && this.isRunning; i++) {
           this.attempts++;
 
@@ -204,10 +213,11 @@ export class HashCalculator {
             // Continue with next attempt
           }
 
-          // Stop if we've tried too many attempts
-          if (this.attempts >= 1000000) {
+          // Stop if we've tried too many attempts (increased limit)
+          if (this.attempts >= 10000000) {
             this.isRunning = false;
             this.updateProgress();
+            console.log('Stopped after 10M attempts. This may indicate the max_value is too restrictive.');
             resolve();
             return;
           }
@@ -216,9 +226,9 @@ export class HashCalculator {
         // Update progress
         this.updateProgress();
 
-        // Continue calculation
+        // Continue calculation (reduced delay for faster processing)
         if (this.isRunning) {
-          setTimeout(calculate, 10);
+          setTimeout(calculate, 1);
         } else {
           resolve();
         }

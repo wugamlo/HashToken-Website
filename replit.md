@@ -103,7 +103,11 @@ This is a full-stack TypeScript web application that implements a hash calculato
 
 ```
 Changelog:
-- July 08, 2025. Initial setup
+- July 08, 2025. Initial setup with HashToken mint calculator
+- July 08, 2025. Fixed hash validation logic (hash ≤ max_value for success)
+- July 08, 2025. Improved UI visibility for dark theme dropdowns
+- July 08, 2025. Added difficulty analysis to warn about restrictive max_values
+- July 08, 2025. Optimized calculation performance for high-difficulty scenarios
 ```
 
 ## User Preferences

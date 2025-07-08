@@ -119,7 +119,7 @@ export default function HashCalculator() {
                   placeholder="e.g., 57896044618658097711785492504343953926634992332820282019728792003956564819967"
                   value={maxValue}
                   onChange={(e) => setMaxValue(e.target.value)}
-                  className="bg-slate-900 border-slate-600 text-white"
+                  className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-400"
                 />
                 <p className="text-xs text-slate-400 flex items-center gap-1">
                   <Info size={12} />
@@ -134,7 +134,7 @@ export default function HashCalculator() {
                   placeholder="e.g., 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
                   value={prevHash}
                   onChange={(e) => setPrevHash(e.target.value)}
-                  className="bg-slate-900 border-slate-600 text-white"
+                  className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-400"
                 />
                 <p className="text-xs text-slate-400 flex items-center gap-1">
                   <Info size={12} />
@@ -147,14 +147,14 @@ export default function HashCalculator() {
               <div className="space-y-2">
                 <Label htmlFor="maxSolutions">Max Solutions</Label>
                 <Select value={maxSolutions} onValueChange={setMaxSolutions}>
-                  <SelectTrigger className="bg-slate-900 border-slate-600">
+                  <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 Solution</SelectItem>
-                    <SelectItem value="5">5 Solutions</SelectItem>
-                    <SelectItem value="10">10 Solutions</SelectItem>
-                    <SelectItem value="20">20 Solutions</SelectItem>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="1" className="text-white hover:bg-slate-700">1 Solution</SelectItem>
+                    <SelectItem value="5" className="text-white hover:bg-slate-700">5 Solutions</SelectItem>
+                    <SelectItem value="10" className="text-white hover:bg-slate-700">10 Solutions</SelectItem>
+                    <SelectItem value="20" className="text-white hover:bg-slate-700">20 Solutions</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -162,12 +162,12 @@ export default function HashCalculator() {
               <div className="space-y-2">
                 <Label htmlFor="searchMethod">Search Method</Label>
                 <Select value={searchMethod} onValueChange={setSearchMethod}>
-                  <SelectTrigger className="bg-slate-900 border-slate-600">
+                  <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="incremental">Incremental Search</SelectItem>
-                    <SelectItem value="random">Random Search</SelectItem>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="incremental" className="text-white hover:bg-slate-700">Incremental Search</SelectItem>
+                    <SelectItem value="random" className="text-white hover:bg-slate-700">Random Search</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -200,10 +200,22 @@ export default function HashCalculator() {
                   setPrevHash("0x2d3875610ea43ff64255da32b982a2359d6c4853314898c1ccebc91ee8a00ee4");
                 }}
                 variant="outline"
-                className="border-slate-600 text-slate-300"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
                 <Settings className="mr-2" size={16} />
                 Use Your Contract Values
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  setMaxValue("57896044618658097711785492504343953926634992332820282019728792003956564819967");
+                  setPrevHash("0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+                }}
+                variant="outline"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              >
+                <Settings className="mr-2" size={16} />
+                Use Test Values (50% chance)
               </Button>
             </div>
           </CardContent>
@@ -347,6 +359,35 @@ export default function HashCalculator() {
               <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
               {isCalculating ? "Calculating hash values..." : "Ready to calculate hash values. Enter contract parameters above."}
             </div>
+
+            {maxValue && (
+              <div className="bg-yellow-900/30 border border-yellow-600/50 p-4 rounded-lg">
+                <h4 className="font-semibold text-yellow-400 mb-2 flex items-center gap-2">
+                  <AlertTriangle size={16} />
+                  Difficulty Analysis
+                </h4>
+                <div className="text-sm text-yellow-300">
+                  {(() => {
+                    try {
+                      const maxVal = BigInt(maxValue);
+                      const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+                      const probability = Number(maxVal * BigInt(100000)) / Number(maxPossible) / 100000;
+                      const expectedAttempts = Math.ceil(1 / probability);
+                      
+                      if (expectedAttempts > 1000000) {
+                        return `Very high difficulty: Expected ~${(expectedAttempts / 1000000).toFixed(1)}M attempts needed. Your contract's max_value is very restrictive (${(probability * 100).toFixed(8)}% success rate). Consider using "Test Values" first to verify the calculation works.`;
+                      } else if (expectedAttempts > 10000) {
+                        return `High difficulty: Expected ~${(expectedAttempts / 1000).toFixed(0)}K attempts needed.`;
+                      } else {
+                        return `Moderate difficulty: Expected ~${expectedAttempts} attempts needed.`;
+                      }
+                    } catch {
+                      return 'Invalid max_value format.';
+                    }
+                  })()}
+                </div>
+              </div>
+            )}
 
             <div className="bg-slate-900 p-4 rounded-lg">
               <h4 className="font-semibold text-yellow-400 mb-2 flex items-center gap-2">
