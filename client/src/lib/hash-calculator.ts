@@ -47,7 +47,14 @@ export class HashCalculator {
 
   private generateRandomBytes32(): string {
     const bytes = new Uint8Array(32);
-    crypto.getRandomValues(bytes);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      crypto.getRandomValues(bytes);
+    } else {
+      // Fallback for Node.js environment
+      for (let i = 0; i < 32; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+    }
     return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
@@ -58,20 +65,32 @@ export class HashCalculator {
   }
 
   private calculateHash(value: string, prevHash: string): string {
-    // Remove 0x prefix for calculation
-    const valueHex = value.startsWith('0x') ? value.slice(2) : value;
-    const prevHashHex = prevHash.startsWith('0x') ? prevHash.slice(2) : prevHash;
-    
-    // Convert hex strings to bytes
-    const valueBytes = Buffer.from(valueHex, 'hex');
-    const prevHashBytes = Buffer.from(prevHashHex, 'hex');
-    
-    // Concatenate bytes (value + prevHash as per contract sha3(value, prev_hash))
-    const combined = Buffer.concat([valueBytes, prevHashBytes]);
-    
-    // Calculate keccak256 hash
-    const hashHex = keccak256(combined);
-    return '0x' + hashHex;
+    try {
+      // Remove 0x prefix for calculation
+      const valueHex = value.startsWith('0x') ? value.slice(2) : value;
+      const prevHashHex = prevHash.startsWith('0x') ? prevHash.slice(2) : prevHash;
+      
+      // Validate hex strings
+      if (!/^[0-9a-fA-F]+$/.test(valueHex) || !/^[0-9a-fA-F]+$/.test(prevHashHex)) {
+        throw new Error(`Invalid hex format: value=${valueHex.slice(0,10)}..., prevHash=${prevHashHex.slice(0,10)}...`);
+      }
+      
+      // Convert hex strings to Uint8Array (browser-compatible)
+      const valueBytes = new Uint8Array(valueHex.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+      const prevHashBytes = new Uint8Array(prevHashHex.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+      
+      // Concatenate bytes (value + prevHash as per contract sha3(value, prev_hash))
+      const combined = new Uint8Array(valueBytes.length + prevHashBytes.length);
+      combined.set(valueBytes, 0);
+      combined.set(prevHashBytes, valueBytes.length);
+      
+      // Calculate keccak256 hash
+      const hashHex = keccak256(combined);
+      return '0x' + hashHex;
+    } catch (error) {
+      console.error('Hash calculation failed:', error);
+      throw error;
+    }
   }
 
   private isValidSolution(calculatedHash: string, maxValue: BigInt): boolean {
@@ -83,13 +102,12 @@ export class HashCalculator {
       // But the contract SUCCEEDS when hash <= max_value, so our validation is correct
       const isValid = hashValue <= maxValue;
       
-      // Enhanced debug logging
-      if (this.attempts <= 10) {
+      // Enhanced debug logging for early attempts
+      if (this.attempts <= 5 || (this.attempts % 50000 === 0)) {
         console.log(`Validation attempt ${this.attempts}:`, {
           calculatedHash,
-          hashValue: hashValue.toString(),
-          maxValue: maxValue.toString(),
-          comparison: `${hashValue.toString()} <= ${maxValue.toString()}`,
+          hashValue: hashValue.toString().slice(0, 20) + '...',
+          maxValue: maxValue.toString().slice(0, 20) + '...',
           isValid,
           note: 'Contract succeeds when hash <= max_value'
         });
@@ -188,6 +206,12 @@ export class HashCalculator {
 
             // Calculate hash
             const calculatedHash = this.calculateHash(inputValue, this.prevHash);
+
+            // Debug logging for first few attempts
+            if (this.attempts <= 3) {
+              const isValid = this.isValidSolution(calculatedHash, this.maxValue);
+              console.log(`Attempt ${this.attempts}: input=${inputValue.slice(0, 10)}..., hash=${calculatedHash.slice(0, 10)}..., isValid=${isValid}`);
+            }
 
             // Check if valid
             if (this.isValidSolution(calculatedHash, this.maxValue)) {
