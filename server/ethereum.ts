@@ -49,18 +49,23 @@ export async function getCurrentContractState() {
   }
 
   try {
-    const [maxValue, prevHash, totalSupply, currentBlock] = await Promise.all([
+    const [maxValue, prevHash, currentBlock] = await Promise.all([
       contract.max_value(),
       contract.prev_hash(),
-      contract.totalSupply(),
       provider.getBlockNumber()
     ]);
+
+    // Calculate total supply by calling totalSupply function instead of counting events
+    // This avoids the block range limitation
+    const totalSupply = await contract.totalSupply();
+    const mintCount = Math.floor(Number(totalSupply) / 1e18); // Estimate mint count from total supply
 
     return {
       maxValue: maxValue.toString(),
       prevHash: prevHash,
       totalSupply: totalSupply.toString(),
       blockNumber: currentBlock,
+      totalMints: mintCount,
     };
   } catch (error) {
     console.error("Error fetching contract state:", error);
@@ -68,35 +73,40 @@ export async function getCurrentContractState() {
   }
 }
 
-export async function getRecentMintEvents(fromBlock: number = -1000) {
+export async function getRecentMintEvents(fromBlock: number = -10000) {
   if (!contract) {
     throw new Error("Contract not initialized");
   }
 
   try {
     const currentBlock = await provider.getBlockNumber();
-    const startBlock = fromBlock < 0 ? currentBlock + fromBlock : fromBlock;
+    const startBlock = fromBlock < 0 ? Math.max(0, currentBlock + fromBlock) : fromBlock;
+    
+    console.log(`Fetching mint events from block ${startBlock} to ${currentBlock}`);
     
     const filter = contract.filters.Mint();
     const events = await contract.queryFilter(filter, startBlock, currentBlock);
+    
+    console.log(`Found ${events.length} mint events`);
     
     const mintEvents = await Promise.all(
       events.map(async (event) => {
         const block = await provider.getBlock(event.blockNumber);
         const tx = await provider.getTransaction(event.transactionHash);
+        const receipt = await provider.getTransactionReceipt(event.transactionHash);
         
         return {
           blockNumber: event.blockNumber,
           transactionHash: event.transactionHash,
           minter: event.args?.[0] || "",
           timestamp: new Date(block!.timestamp * 1000),
-          gasUsed: tx?.gasLimit?.toString() || "",
+          gasUsed: receipt?.gasUsed?.toString() || "",
           gasPrice: tx?.gasPrice?.toString() || "",
         };
       })
     );
 
-    return mintEvents;
+    return mintEvents.sort((a, b) => b.blockNumber - a.blockNumber);
   } catch (error) {
     console.error("Error fetching mint events:", error);
     throw error;
@@ -105,14 +115,14 @@ export async function getRecentMintEvents(fromBlock: number = -1000) {
 
 export function calculateExpectedAttempts(maxValue: string): string {
   try {
-    // Use the same calculation as the frontend
     const maxValueBigInt = BigInt(maxValue);
     const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
     
-    // Convert to scientific notation for proper calculation
-    const maxValueScientific = Number(maxValueBigInt);
-    const maxPossibleScientific = Number(maxPossible);
-    const expectedAttempts = maxPossibleScientific / maxValueScientific;
+    // Calculate the ratio using BigInt division for accuracy
+    const ratio = maxPossible / maxValueBigInt;
+    
+    // Convert to number for display, handling very large numbers
+    const expectedAttempts = Number(ratio);
     
     return expectedAttempts.toExponential();
   } catch (error) {

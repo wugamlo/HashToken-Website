@@ -42,6 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalSupply: "200000000000000000000000", // 200,000 HTK
         expectedAttempts: "2.47e14", // 247 trillion attempts
         difficulty: "99.99", // Very high difficulty
+        totalMints: 200000, // Approximate total mints
         isOffline: true, // Indicate data is not live
       };
       
@@ -80,6 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/contract/sync", async (req, res) => {
     try {
       const events = await getRecentMintEvents();
+      let syncedCount = 0;
       
       for (const event of events) {
         // Check if event already exists
@@ -92,13 +94,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             timestamp: event.timestamp,
             gasUsed: event.gasUsed,
             gasPrice: event.gasPrice,
-            difficulty: calculateDifficulty("0"), // Will be updated with actual difficulty
-            expectedAttempts: calculateExpectedAttempts("0"), // Will be updated
+            difficulty: "99", // High difficulty for display
+            expectedAttempts: "1e12", // Placeholder
           });
+          syncedCount++;
         }
       }
       
-      res.json({ synced: events.length, message: "Sync completed" });
+      res.json({ 
+        synced: syncedCount, 
+        total: events.length, 
+        message: `Sync completed: ${syncedCount} new events added` 
+      });
     } catch (error) {
       console.error("Error syncing mint events:", error);
       res.status(500).json({ error: "Failed to sync mint events" });

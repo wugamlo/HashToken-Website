@@ -19,23 +19,13 @@ export function Navigation() {
           
           <div className="flex items-center space-x-2">
             <Button
-              variant={location === "/" ? "default" : "ghost"}
+              variant="default"
               size="sm"
               asChild
             >
               <Link href="/">
                 <Hash className="h-4 w-4 mr-2" />
-                Info
-              </Link>
-            </Button>
-            <Button
-              variant={location === "/calculator" ? "default" : "ghost"}
-              size="sm"
-              asChild
-            >
-              <Link href="/calculator">
-                <Calculator className="h-4 w-4 mr-2" />
-                Calculator
+                HashToken Info
               </Link>
             </Button>
           </div>
