@@ -274,7 +274,7 @@ export default function HashTokenInfo() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm font-medium">Decimals:</span>
-                    <span className="text-sm">18</span>
+                    <span className="text-sm">16</span>
                   </div>
                   {contractState && (
                     <div className="flex justify-between">
@@ -564,7 +564,7 @@ export default function HashTokenInfo() {
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium">Decimals:</span>
-                        <span>18</span>
+                        <span>16</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium">Network:</span>
