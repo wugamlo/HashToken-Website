@@ -481,43 +481,13 @@ export default function HashTokenInfo() {
                   </div>
                 </div>
 
-                {/* New Metrics Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Gas Usage Analysis</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Average Gas Used:</span>
-                        <span className="text-sm font-mono">~165K gas</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Historical Gas Range:</span>
-                        <span className="text-sm font-mono">21K - 180K</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Total Gas Consumed:</span>
-                        <span className="text-sm font-mono">~300M gas</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Mining Economics</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Current Reward:</span>
-                        <span className="text-sm font-mono">1 HTK</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Historical Total:</span>
-                        <span className="text-sm font-mono">
-                          {contractState?.totalSupply ? `${(parseInt(contractState.totalSupply) / 10**16).toFixed(1)} HTK` : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Mining Efficiency:</span>
-                        <span className="text-sm font-mono">Exponentially decreasing</span>
-                      </div>
+                {/* Gas Usage Analysis */}
+                <div className="space-y-3 mt-6">
+                  <h4 className="font-medium">Gas Usage Analysis</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                      <span className="text-sm">Total Gas Consumed:</span>
+                      <span className="text-sm font-mono">~300M gas</span>
                     </div>
                   </div>
                 </div>
@@ -547,122 +517,6 @@ export default function HashTokenInfo() {
                     </div>
                   </div>
                 </div>
-
-                {/* Historical Timeline Analysis */}
-                <div className="space-y-3 mt-6">
-                  <h4 className="font-medium">Historical Timeline</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className="text-lg font-bold text-indigo-600">2016</div>
-                      <div className="text-sm text-muted-foreground">First Era</div>
-                      <div className="text-xs text-muted-foreground">1,921 mints</div>
-                    </div>
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className="text-lg font-bold text-cyan-600">2017-2024</div>
-                      <div className="text-sm text-muted-foreground">Dormant Period</div>
-                      <div className="text-xs text-muted-foreground">0 mints</div>
-                    </div>
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className="text-lg font-bold text-emerald-600">2025</div>
-                      <div className="text-sm text-muted-foreground">Revival Era</div>
-                      <div className="text-xs text-muted-foreground">
-                        {contractState?.totalMints ? (contractState.totalMints - 1921).toLocaleString() : '0'} mints
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mining Competition Analysis */}
-                <div className="space-y-3 mt-6">
-                  <h4 className="font-medium">Mining Competition Metrics</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Top Miner Dominance:</span>
-                        <span className="text-sm font-mono">57.8%</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Gini Coefficient:</span>
-                        <span className="text-sm font-mono">0.72 (High)</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Active Miners (2025):</span>
-                        <span className="text-sm font-mono">14 miners</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Mining Burst Pattern:</span>
-                        <span className="text-sm font-mono">3-day window</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Average Mints/Day:</span>
-                        <span className="text-sm font-mono">~15 (recent)</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Competition Level:</span>
-                        <span className="text-sm font-mono">Intense</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Network Economics Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Network Economics</CardTitle>
-              <CardDescription>Economic analysis of HashToken mining</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Energy & Cost Analysis</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Est. Computational Work:</span>
-                        <span className="text-sm font-mono">~800M attempts</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Network Difficulty:</span>
-                        <span className="text-sm font-mono">Exponential growth</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Mining Sustainability:</span>
-                        <span className="text-sm font-mono">Challenging</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Token Distribution</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Genesis Period (2016):</span>
-                        <span className="text-sm font-mono">98.2% of supply</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Revival Period (2025):</span>
-                        <span className="text-sm font-mono">1.8% of supply</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="text-sm">Remaining Mineable:</span>
-                        <span className="text-sm font-mono">Theoretically infinite</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Alert>
-                  <Activity className="h-4 w-4" />
-                  <AlertDescription>
-                    The exponential difficulty curve means each new mint requires approximately 1% more computational work than the previous one. 
-                    This creates a natural scarcity mechanism that becomes increasingly challenging for miners over time.
-                  </AlertDescription>
-                </Alert>
               </div>
             </CardContent>
           </Card>
