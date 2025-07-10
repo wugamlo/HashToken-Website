@@ -26,10 +26,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use accurate historical count from Etherscan CSV analysis
       const historicalMintCount = getHistoricalMintCount(); // 1,921 successful mint transactions
       
-      // Use only the historical count since our database events are duplicates from the CSV data
-      const totalMints = historicalMintCount; // Exactly 1,921 successful mints
+      // Count unique new mints in our database that aren't in the historical CSV data
+      // The CSV data goes up to a certain date, so any events after that are new mints
+      const newMintsFromDB = actualMintCount; // These are post-CSV events
+      const totalMints = historicalMintCount + newMintsFromDB;
       
-      console.log(`Using ${historicalMintCount} total mints from Etherscan CSV analysis (successful transactions only)`);
+      console.log(`Historical mints: ${historicalMintCount}, New mints from DB: ${newMintsFromDB}, Total: ${totalMints}`);
       
       // Store in database
       await storage.updateContractState({
