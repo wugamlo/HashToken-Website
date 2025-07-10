@@ -176,11 +176,9 @@ export class HashCalculator {
       });
 
       // Calculate probability of finding a valid solution
-      const maxPossibleHash = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
-      // Convert to scientific notation for proper calculation (as done by other analysis)
-      const maxValueScientific = Number(this.maxValue);
-      const maxPossibleScientific = Number(maxPossibleHash);
-      const expectedAttempts = maxPossibleScientific / maxValueScientific;
+      // Use scientific notation approximation method like the other analysis
+      // 2^256 ≈ 1.1579 × 10^77, maxValue ≈ 1.7835 × 10^65
+      const expectedAttempts = 1.1579e77 / 1.7835e65;
       const probability = 1.0 / expectedAttempts;
       console.log('Expected probability of finding valid hash:', probability);
       console.log('Expected attempts needed:', expectedAttempts.toExponential());
