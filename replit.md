@@ -143,6 +143,9 @@ Changelog:
 - July 10, 2025. MAJOR ARCHITECTURE IMPROVEMENT: Implemented one-time migration of all 1,921 historical transactions to database
 - July 10, 2025. Simplified data architecture to use database as single source of truth for all mint events (1,951 total)
 - July 10, 2025. Removed complex deduplication logic in favor of transaction hash uniqueness in database
+- July 10, 2025. Fixed refresh button functionality - now properly invalidates React Query caches and updates all data
+- July 10, 2025. Replaced meaningless Mining Trend Analysis with real Mining Activity Analysis showing authentic miner statistics
+- July 10, 2025. CALCULATION REVERT: Based on miner feedback, reverted expected attempts calculation from 717 billion back to 717 thousand
 ```
 
 ## User Preferences
