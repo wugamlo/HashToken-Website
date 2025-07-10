@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty } from "./ethereum";
-import { getHistoricalMintCount } from "./csv-parser";
+import { getHistoricalMintCount, isHistoricalTransaction } from "./csv-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Ethereum provider
@@ -26,9 +26,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use accurate historical count from Etherscan CSV analysis
       const historicalMintCount = getHistoricalMintCount(); // 1,921 successful mint transactions
       
-      // Count unique new mints in our database that aren't in the historical CSV data
-      // The CSV data goes up to a certain date, so any events after that are new mints
-      const newMintsFromDB = actualMintCount; // These are post-CSV events
+      // Filter out database events that are already in the historical CSV data
+      const newMintsFromDB = mintEvents.filter(event => 
+        !isHistoricalTransaction(event.transactionHash)
+      ).length;
+      
       const totalMints = historicalMintCount + newMintsFromDB;
       
       console.log(`Historical mints: ${historicalMintCount}, New mints from DB: ${newMintsFromDB}, Total: ${totalMints}`);
