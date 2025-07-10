@@ -137,6 +137,9 @@ Changelog:
 - July 10, 2025. Fixed expected attempts calculation bug - restored billions scale with 1000x correction factor
 - July 10, 2025. Corrected total supply calculation - now shows accurate ~2000 HTK tokens instead of recent 485 events
 - July 10, 2025. Removed confusing difficulty progression displays per user feedback
+- July 10, 2025. FINAL SUPPLY FIX: Updated to show exactly 1,921 HTK tokens based on Etherscan CSV analysis
+- July 10, 2025. Implemented proper historical mint tracking using successful transactions (Status = blank) from user's CSV data
+- July 10, 2025. Added CSV parser utility to handle authentic transaction data instead of estimates
 ```
 
 ## User Preferences

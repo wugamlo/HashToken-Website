@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty } from "./ethereum";
+import { getHistoricalMintCount } from "./csv-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Ethereum provider
@@ -22,26 +23,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const mintEvents = await storage.getRecentMintEvents(9999);
       const actualMintCount = mintEvents.length;
       
-      // Based on user feedback, actual total should be closer to 2000 mints
-      // Current database only has recent events, so estimate total historical mints
-      const estimatedTotalMints = Math.max(actualMintCount, 2000);
+      // Use accurate historical count from Etherscan CSV analysis
+      const historicalMintCount = getHistoricalMintCount(); // 1,921 successful mint transactions
       
-      console.log(`Found ${actualMintCount} mint events in database, estimating ${estimatedTotalMints} total historical mints`);
+      // Use only the historical count since our database events are duplicates from the CSV data
+      const totalMints = historicalMintCount; // Exactly 1,921 successful mints
+      
+      console.log(`Using ${historicalMintCount} total mints from Etherscan CSV analysis (successful transactions only)`);
       
       // Store in database
       await storage.updateContractState({
         blockNumber: state.blockNumber,
         maxValue: state.maxValue,
         prevHash: state.prevHash,
-        totalSupply: estimatedTotalMints.toString(),
+        totalSupply: totalMints.toString(),
       });
       
       res.json({
         ...state,
         expectedAttempts,
         difficulty,
-        totalMints: estimatedTotalMints,
-        totalSupply: estimatedTotalMints.toString(), // Each mint = 1 HTK
+        totalMints: totalMints,
+        totalSupply: totalMints.toString(), // Each mint = 1 HTK
       });
     } catch (error) {
       console.error("Error fetching contract state:", error);
