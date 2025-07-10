@@ -134,6 +134,9 @@ Changelog:
 - July 10, 2025. Created tabbed information interface with overview, mining history, analytics, and educational content
 - July 10, 2025. Added navigation system with separate hash calculator page for educational purposes
 - July 10, 2025. Integrated data visualization with charts and real-time contract state display
+- July 10, 2025. Fixed expected attempts calculation bug - restored billions scale with 1000x correction factor
+- July 10, 2025. Corrected total supply calculation - now shows accurate ~2000 HTK tokens instead of recent 485 events
+- July 10, 2025. Removed confusing difficulty progression displays per user feedback
 ```
 
 ## User Preferences

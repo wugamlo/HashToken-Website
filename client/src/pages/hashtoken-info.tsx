@@ -322,52 +322,10 @@ export default function HashTokenInfo() {
         </TabsContent>
 
         <TabsContent value="mining" className="space-y-6">
-          {/* Difficulty Progression Chart */}
-          {mintEvents && mintEvents.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Difficulty Progression</CardTitle>
-                <CardDescription>Visual representation of mining difficulty over time</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={mintEvents.slice(0, 20).reverse()}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(240, 3.7%, 15.9%)" />
-                    <XAxis 
-                      dataKey="blockNumber" 
-                      tickFormatter={(value) => `${Math.floor(value / 1000)}K`}
-                      stroke="hsl(240, 5%, 64.9%)"
-                    />
-                    <YAxis 
-                      stroke="hsl(240, 5%, 64.9%)"
-                      tickFormatter={(value) => `${value}%`}
-                    />
-                    <Tooltip 
-                      labelFormatter={(value) => `Block ${value.toLocaleString()}`}
-                      formatter={(value) => [`${value}%`, 'Difficulty']}
-                      contentStyle={{
-                        backgroundColor: 'hsl(240, 10%, 3.9%)',
-                        border: '1px solid hsl(240, 3.7%, 15.9%)',
-                        borderRadius: '8px'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="difficulty" 
-                      stroke="hsl(0, 72%, 51%)" 
-                      strokeWidth={2}
-                      dot={{ fill: 'hsl(0, 72%, 51%)', strokeWidth: 2, r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
-          
           <Card>
             <CardHeader>
               <CardTitle>Mining History</CardTitle>
-              <CardDescription>Recent mining events and difficulty progression</CardDescription>
+              <CardDescription>Recent mining events from the HashToken contract</CardDescription>
             </CardHeader>
             <CardContent>
               {eventsLoading ? (
@@ -381,9 +339,6 @@ export default function HashTokenInfo() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">Block {event.blockNumber.toLocaleString()}</Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {parseFloat(event.difficulty || '0').toFixed(1)}% difficulty
-                          </Badge>
                           <span className="text-sm text-muted-foreground">
                             {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
                           </span>
@@ -499,27 +454,13 @@ export default function HashTokenInfo() {
                 </Alert>
 
                 {contractState && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  <div className="grid grid-cols-1 gap-4 mt-4">
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">Current Difficulty</h4>
+                      <h4 className="font-medium text-sm mb-2">Current Mining Difficulty</h4>
                       <p className="text-lg font-bold text-orange-500">
                         {formatExpectedAttempts(contractState.expectedAttempts)}
                       </p>
-                      <p className="text-xs text-muted-foreground">attempts needed now</p>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">After 1 More Mint</h4>
-                      <p className="text-lg font-bold text-red-500">
-                        {formatExpectedAttempts((parseFloat(contractState.expectedAttempts) / 0.99).toExponential())}
-                      </p>
-                      <p className="text-xs text-muted-foreground">1% harder (max_value decreases)</p>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">After 10 More Mints</h4>
-                      <p className="text-lg font-bold text-red-600">
-                        {formatExpectedAttempts((parseFloat(contractState.expectedAttempts) / Math.pow(0.99, 10)).toExponential())}
-                      </p>
-                      <p className="text-xs text-muted-foreground">10.46% harder overall</p>
+                      <p className="text-xs text-muted-foreground">statistical attempts needed for next successful mint</p>
                     </div>
                   </div>
                 )}
