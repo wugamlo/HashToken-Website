@@ -83,6 +83,13 @@ export default function HashTokenInfo() {
 
   const formatTokenAmount = (amount: string): string => {
     try {
+      // If the amount is already a simple number (not wei), return it directly
+      const num = parseInt(amount);
+      if (num < 1000000) {
+        return num.toLocaleString();
+      }
+      
+      // Otherwise, assume it's in wei and convert
       const bigNum = BigInt(amount);
       const tokens = bigNum / BigInt('1000000000000000000'); // Divide by 10^18
       return tokens.toLocaleString();
@@ -202,7 +209,7 @@ export default function HashTokenInfo() {
               <CardTitle className="text-sm font-medium">Total Supply</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{contractState.totalMints || 0}</div>
+              <div className="text-2xl font-bold">{formatTokenAmount(contractState.totalSupply)}</div>
               <p className="text-xs text-muted-foreground">HTK Tokens (1 per mint)</p>
             </CardContent>
           </Card>
@@ -494,25 +501,25 @@ export default function HashTokenInfo() {
                 {contractState && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">Next Mint</h4>
+                      <h4 className="font-medium text-sm mb-2">Current Difficulty</h4>
                       <p className="text-lg font-bold text-orange-500">
                         {formatExpectedAttempts(contractState.expectedAttempts)}
                       </p>
-                      <p className="text-xs text-muted-foreground">attempts needed</p>
+                      <p className="text-xs text-muted-foreground">attempts needed now</p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">After Next Mint</h4>
+                      <h4 className="font-medium text-sm mb-2">After 1 More Mint</h4>
                       <p className="text-lg font-bold text-red-500">
-                        {formatExpectedAttempts((parseFloat(contractState.expectedAttempts) * 1.01).toExponential())}
+                        {formatExpectedAttempts((parseFloat(contractState.expectedAttempts) / 0.99).toExponential())}
                       </p>
-                      <p className="text-xs text-muted-foreground">+1% difficulty</p>
+                      <p className="text-xs text-muted-foreground">1% harder (max_value decreases)</p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">10 Mints Later</h4>
+                      <h4 className="font-medium text-sm mb-2">After 10 More Mints</h4>
                       <p className="text-lg font-bold text-red-600">
-                        {formatExpectedAttempts((parseFloat(contractState.expectedAttempts) * Math.pow(1.01, 10)).toExponential())}
+                        {formatExpectedAttempts((parseFloat(contractState.expectedAttempts) / Math.pow(0.99, 10)).toExponential())}
                       </p>
-                      <p className="text-xs text-muted-foreground">+10.46% difficulty</p>
+                      <p className="text-xs text-muted-foreground">10.46% harder overall</p>
                     </div>
                   </div>
                 )}

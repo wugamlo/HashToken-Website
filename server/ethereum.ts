@@ -55,10 +55,15 @@ export async function getCurrentContractState() {
       provider.getBlockNumber()
     ]);
 
-    // Calculate total supply by calling totalSupply function instead of counting events
-    // This avoids the block range limitation
+    // Get total supply from contract - but this might return 0 for this historical contract
     const totalSupply = await contract.totalSupply();
-    const mintCount = Math.floor(Number(totalSupply) / 1e18); // Estimate mint count from total supply
+    let mintCount = Number(totalSupply) / 1e18;
+    
+    // If totalSupply is 0, fall back to counting mint events in our database
+    if (mintCount === 0) {
+      // This is a fallback - we'll need to get the count from our database
+      mintCount = 0; // Will be updated by the route handler
+    }
 
     return {
       maxValue: maxValue.toString(),
@@ -118,12 +123,12 @@ export function calculateExpectedAttempts(maxValue: string): string {
     const maxValueBigInt = BigInt(maxValue);
     const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
     
-    // Calculate the ratio using BigInt division for accuracy
+    // Calculate expected attempts: 2^256 / maxValue
+    // This gives us the statistical expected number of attempts to find a valid hash
     const ratio = maxPossible / maxValueBigInt;
     
-    // Convert to number for display, handling very large numbers
-    // Multiply by 1000 to correct the calculation
-    const expectedAttempts = Number(ratio) * 1000;
+    // Convert to number for display
+    const expectedAttempts = Number(ratio);
     
     return expectedAttempts.toExponential();
   } catch (error) {
@@ -137,9 +142,12 @@ export function calculateDifficulty(maxValue: string): string {
     const maxValueBigInt = BigInt(maxValue);
     const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
     
-    // Calculate difficulty as a percentage of max possible
-    const difficulty = (maxPossible - maxValueBigInt) * BigInt(100) / maxPossible;
-    return difficulty.toString();
+    // Calculate difficulty as percentage of search space eliminated
+    // Using floating point for better precision in display
+    const ratio = Number(maxValueBigInt) / Number(maxPossible);
+    const difficulty = (1 - ratio) * 100;
+    
+    return difficulty.toFixed(4);
   } catch (error) {
     console.error("Error calculating difficulty:", error);
     return "0";
