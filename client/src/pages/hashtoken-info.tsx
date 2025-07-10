@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,17 +36,18 @@ interface MintEvent {
 
 export default function HashTokenInfo() {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: contractState, isLoading: stateLoading, refetch: refetchState } = useQuery<ContractState>({
     queryKey: ['/api/contract/state'],
   });
 
-  const { data: mintEvents, isLoading: eventsLoading } = useQuery<MintEvent[]>({
+  const { data: mintEvents, isLoading: eventsLoading, refetch: refetchMintEvents } = useQuery<MintEvent[]>({
     queryKey: ['/api/contract/mint-events'],
     queryFn: () => fetch('/api/contract/mint-events?limit=50').then(res => res.json()),
   });
 
-  const { data: historyEvents } = useQuery<MintEvent[]>({
+  const { data: historyEvents, refetch: refetchHistory } = useQuery<MintEvent[]>({
     queryKey: ['/api/contract/history'],
     queryFn: () => fetch('/api/contract/history?days=30').then(res => res.json()),
   });
@@ -54,8 +55,22 @@ export default function HashTokenInfo() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
+      // First sync with blockchain to get new mint events
       await fetch('/api/contract/sync', { method: 'POST' });
-      await refetchState();
+      
+      // Then invalidate all caches and refetch all queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['/api/contract/state'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/contract/mint-events'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/contract/history'] }),
+      ]);
+      
+      // Also explicitly refetch to ensure immediate updates
+      await Promise.all([
+        refetchState(),
+        refetchMintEvents(),
+        refetchHistory(),
+      ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
     } finally {
