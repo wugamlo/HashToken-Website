@@ -437,33 +437,58 @@ export default function HashTokenInfo() {
             </Card>
           </div>
 
-          {/* Mining Trend Analysis */}
+          {/* Mining Activity Analysis */}
           <Card>
             <CardHeader>
-              <CardTitle>Mining Trend Analysis</CardTitle>
-              <CardDescription>Expected attempts progression over time</CardDescription>
+              <CardTitle>Mining Activity Analysis</CardTitle>
+              <CardDescription>Recent mining activity and miner distribution</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">14</div>
+                    <div className="text-sm text-muted-foreground">Unique Miners</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">1,951</div>
+                    <div className="text-sm text-muted-foreground">Total Mints</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">1,595</div>
+                    <div className="text-sm text-muted-foreground">Peak Day</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">3 days</div>
+                    <div className="text-sm text-muted-foreground">Active Period</div>
+                  </div>
+                </div>
+
                 <Alert>
-                  <TrendingUp className="h-4 w-4" />
+                  <Activity className="h-4 w-4" />
                   <AlertDescription>
-                    The exponential increase in difficulty means each mint becomes approximately 1% harder than the previous one.
-                    Current mining requires trillions of attempts, making it computationally intensive.
+                    Mining activity peaked on July 8, 2025, with 1,595 successful mints in a single day. 
+                    Most mining activity occurred during July 7-9, 2025, showing renewed interest in this historic token.
                   </AlertDescription>
                 </Alert>
 
-                {contractState && (
-                  <div className="grid grid-cols-1 gap-4 mt-4">
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">Current Mining Difficulty</h4>
-                      <p className="text-lg font-bold text-orange-500">
-                        {formatExpectedAttempts(contractState.expectedAttempts)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">statistical attempts needed for next successful mint</p>
+                <div className="space-y-3">
+                  <h4 className="font-medium">Top Miners by Activity</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                      <span className="text-sm font-mono">0x4822...2484</span>
+                      <span className="text-sm font-bold">1,134 mints</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                      <span className="text-sm font-mono">0x0559...b646</span>
+                      <span className="text-sm font-bold">269 mints</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                      <span className="text-sm font-mono">0x0a7D...90FD</span>
+                      <span className="text-sm font-bold">141 mints</span>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             </CardContent>
           </Card>
