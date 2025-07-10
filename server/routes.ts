@@ -86,6 +86,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get all miners with their mint counts
+  app.get("/api/contract/miners", async (req, res) => {
+    try {
+      const events = await storage.getRecentMintEvents(10000); // Get all events
+      
+      // Group by miner and count mints
+      const minerCounts = new Map<string, number>();
+      events.forEach(event => {
+        const current = minerCounts.get(event.minter) || 0;
+        minerCounts.set(event.minter, current + 1);
+      });
+      
+      // Convert to array and sort by count (descending)
+      const miners = Array.from(minerCounts.entries())
+        .map(([address, count]) => ({ address, count }))
+        .sort((a, b) => b.count - a.count);
+      
+      res.json(miners);
+    } catch (error) {
+      console.error("Error fetching miners:", error);
+      res.status(500).json({ error: "Failed to fetch miners" });
+    }
+  });
+  
   // Sync recent mint events from blockchain
   app.post("/api/contract/sync", async (req, res) => {
     try {

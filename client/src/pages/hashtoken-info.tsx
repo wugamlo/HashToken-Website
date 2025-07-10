@@ -52,6 +52,11 @@ export default function HashTokenInfo() {
     queryFn: () => fetch('/api/contract/history?days=30').then(res => res.json()),
   });
 
+  const { data: miners, refetch: refetchMiners } = useQuery<Array<{address: string, count: number}>>({
+    queryKey: ['/api/contract/miners'],
+    queryFn: () => fetch('/api/contract/miners').then(res => res.json()),
+  });
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -63,6 +68,7 @@ export default function HashTokenInfo() {
         queryClient.invalidateQueries({ queryKey: ['/api/contract/state'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/contract/mint-events'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/contract/history'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/contract/miners'] }),
       ]);
       
       // Also explicitly refetch to ensure immediate updates
@@ -462,7 +468,9 @@ export default function HashTokenInfo() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-3 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">14</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {miners?.length || 'N/A'}
+                    </div>
                     <div className="text-sm text-muted-foreground">Unique Miners</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
@@ -501,20 +509,25 @@ export default function HashTokenInfo() {
                 </Alert>
 
                 <div className="space-y-3">
-                  <h4 className="font-medium">Top Miners by Activity</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center p-2 bg-muted rounded">
-                      <span className="text-sm font-mono">0x4822...2484</span>
-                      <span className="text-sm font-bold">1,134 mints</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-muted rounded">
-                      <span className="text-sm font-mono">0x0559...b646</span>
-                      <span className="text-sm font-bold">269 mints</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-muted rounded">
-                      <span className="text-sm font-mono">0x0a7D...90FD</span>
-                      <span className="text-sm font-bold">141 mints</span>
-                    </div>
+                  <h4 className="font-medium">All Miners by Activity</h4>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {miners && miners.length > 0 ? (
+                      miners.map((miner, index) => (
+                        <div key={miner.address} className="flex justify-between items-center p-2 bg-muted rounded">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-muted-foreground w-6">#{index + 1}</span>
+                            <span className="text-sm font-mono">
+                              {miner.address.slice(0, 6)}...{miner.address.slice(-4)}
+                            </span>
+                          </div>
+                          <span className="text-sm font-bold">{miner.count.toLocaleString()} mints</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4 text-muted-foreground">
+                        Loading miners...
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
