@@ -516,9 +516,14 @@ export default function HashTokenInfo() {
                         <div key={miner.address} className="flex justify-between items-center p-2 bg-muted rounded">
                           <div className="flex items-center space-x-2">
                             <span className="text-xs text-muted-foreground w-6">#{index + 1}</span>
-                            <span className="text-sm font-mono">
+                            <a 
+                              href={`https://etherscan.io/address/${miner.address}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm font-mono hover:text-blue-600 dark:hover:text-blue-400 transition-colors underline decoration-dotted underline-offset-2"
+                            >
                               {miner.address.slice(0, 6)}...{miner.address.slice(-4)}
-                            </span>
+                            </a>
                           </div>
                           <span className="text-sm font-bold">{miner.count.toLocaleString()} mints</span>
                         </div>
