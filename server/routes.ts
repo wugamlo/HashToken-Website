@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty } from "./ethereum";
-import { getHistoricalMintCount, isHistoricalTransaction } from "./csv-parser";
+import { migrateHistoricalTransactions } from "./csv-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Ethereum provider
@@ -19,21 +19,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const expectedAttempts = calculateExpectedAttempts(state.maxValue);
       const difficulty = calculateDifficulty(state.maxValue);
       
-      // Get actual mint count from our database
+      // Get total mint count from database (single source of truth)
       const mintEvents = await storage.getRecentMintEvents(9999);
-      const actualMintCount = mintEvents.length;
+      const totalMints = mintEvents.length;
       
-      // Use accurate historical count from Etherscan CSV analysis
-      const historicalMintCount = getHistoricalMintCount(); // 1,921 successful mint transactions
-      
-      // Filter out database events that are already in the historical CSV data
-      const newMintsFromDB = mintEvents.filter(event => 
-        !isHistoricalTransaction(event.transactionHash)
-      ).length;
-      
-      const totalMints = historicalMintCount + newMintsFromDB;
-      
-      console.log(`Historical mints: ${historicalMintCount}, New mints from DB: ${newMintsFromDB}, Total: ${totalMints}`);
+      console.log(`Total mints from database: ${totalMints}`);
       
       // Store in database
       await storage.updateContractState({
@@ -136,6 +126,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error syncing mint events:", error);
       res.status(500).json({ error: "Failed to sync mint events" });
+    }
+  });
+
+  // Migration endpoint to import historical transactions
+  app.post("/api/migrate-historical", async (req, res) => {
+    try {
+      const migratedCount = await migrateHistoricalTransactions();
+      res.json({ 
+        success: true,
+        migratedCount,
+        message: `Successfully migrated ${migratedCount} historical transactions to database` 
+      });
+    } catch (error) {
+      console.error("Error during migration:", error);
+      res.status(500).json({ error: "Failed to migrate historical transactions" });
     }
   });
 

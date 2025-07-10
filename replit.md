@@ -140,6 +140,9 @@ Changelog:
 - July 10, 2025. FINAL SUPPLY FIX: Updated to show exactly 1,921 HTK tokens based on Etherscan CSV analysis
 - July 10, 2025. Implemented proper historical mint tracking using successful transactions (Status = blank) from user's CSV data
 - July 10, 2025. Added CSV parser utility to handle authentic transaction data instead of estimates
+- July 10, 2025. MAJOR ARCHITECTURE IMPROVEMENT: Implemented one-time migration of all 1,921 historical transactions to database
+- July 10, 2025. Simplified data architecture to use database as single source of truth for all mint events (1,951 total)
+- July 10, 2025. Removed complex deduplication logic in favor of transaction hash uniqueness in database
 ```
 
 ## User Preferences
