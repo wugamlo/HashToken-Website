@@ -196,7 +196,7 @@ export default function HashCalculator() {
 
               <Button
                 onClick={() => {
-                  setMaxValue("191655064516856231946315918192061657504230449685856907525680910693416865540584");
+                  setMaxValue("178352154310923568934782825455846174252727713524957781003412386523589");
                   setPrevHash("0x2d3875610ea43ff64255da32b982a2359d6c4853314898c1ccebc91ee8a00ee4");
                 }}
                 variant="outline"
@@ -371,15 +371,19 @@ export default function HashCalculator() {
                     try {
                       const maxVal = BigInt(maxValue);
                       const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
-                      const probability = Number(maxVal * BigInt(100000)) / Number(maxPossible) / 100000;
-                      const expectedAttempts = Math.ceil(1 / probability);
+                      // Fix: Use BigInt arithmetic to avoid precision loss
+                      const expectedAttempts = maxPossible / maxVal;
+                      const probability = 1.0 / Number(expectedAttempts);
                       
-                      if (expectedAttempts > 1000000) {
-                        return `Very high difficulty: Expected ~${(expectedAttempts / 1000000).toFixed(1)}M attempts needed. Your contract's max_value is very restrictive (${(probability * 100).toFixed(8)}% success rate). Consider using "Test Values" first to verify the calculation works.`;
-                      } else if (expectedAttempts > 10000) {
-                        return `High difficulty: Expected ~${(expectedAttempts / 1000).toFixed(0)}K attempts needed.`;
+                      const expectedAttemptsNum = Number(expectedAttempts);
+                      if (expectedAttemptsNum > 1000000000) {
+                        return `Very high difficulty: Expected ~${(expectedAttemptsNum / 1000000000).toFixed(1)}B attempts needed. Your contract's max_value is very restrictive (${(probability * 100).toFixed(8)}% success rate). Consider using "Test Values" first to verify the calculation works.`;
+                      } else if (expectedAttemptsNum > 1000000) {
+                        return `High difficulty: Expected ~${(expectedAttemptsNum / 1000000).toFixed(1)}M attempts needed. Your contract's max_value is restrictive (${(probability * 100).toFixed(6)}% success rate).`;
+                      } else if (expectedAttemptsNum > 10000) {
+                        return `Medium difficulty: Expected ~${(expectedAttemptsNum / 1000).toFixed(0)}K attempts needed.`;
                       } else {
-                        return `Moderate difficulty: Expected ~${expectedAttempts} attempts needed.`;
+                        return `Low difficulty: Expected ~${expectedAttemptsNum} attempts needed.`;
                       }
                     } catch {
                       return 'Invalid max_value format.';

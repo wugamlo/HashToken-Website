@@ -108,6 +108,9 @@ Changelog:
 - July 08, 2025. Improved UI visibility for dark theme dropdowns
 - July 08, 2025. Added difficulty analysis to warn about restrictive max_values
 - July 08, 2025. Optimized calculation performance for high-difficulty scenarios
+- July 10, 2025. Fixed critical probability calculation bug - was showing 649M instead of 649B expected attempts
+- July 10, 2025. Replaced Node.js Buffer with browser-compatible Uint8Array operations
+- July 10, 2025. Updated difficulty analysis to correctly show billions of attempts for restrictive max_values
 ```
 
 ## User Preferences

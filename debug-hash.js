@@ -2,8 +2,8 @@
 import pkg from 'js-sha3';
 const { keccak256 } = pkg;
 
-// Test values (50% success rate)
-const maxValue = BigInt("57896044618658097711785492504343953926634992332820282019728792003956564819967");
+// Test values - user's actual contract value
+const maxValue = BigInt("178352154310923568934782825455846174252727713524957781003412386523589");
 const prevHash = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
 
 console.log("=== Hash Calculation Debug ===");
