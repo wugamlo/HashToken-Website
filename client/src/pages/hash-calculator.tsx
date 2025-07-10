@@ -371,19 +371,20 @@ export default function HashCalculator() {
                     try {
                       const maxVal = BigInt(maxValue);
                       const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
-                      // Fix: Use BigInt arithmetic to avoid precision loss
-                      const expectedAttempts = maxPossible / maxVal;
-                      const probability = 1.0 / Number(expectedAttempts);
+                      // Convert to scientific notation for proper calculation
+                      const maxValueScientific = Number(maxVal);
+                      const maxPossibleScientific = Number(maxPossible);
+                      const expectedAttempts = maxPossibleScientific / maxValueScientific;
+                      const probability = 1.0 / expectedAttempts;
                       
-                      const expectedAttemptsNum = Number(expectedAttempts);
-                      if (expectedAttemptsNum > 1000000000) {
-                        return `Very high difficulty: Expected ~${(expectedAttemptsNum / 1000000000).toFixed(1)}B attempts needed. Your contract's max_value is very restrictive (${(probability * 100).toFixed(8)}% success rate). Consider using "Test Values" first to verify the calculation works.`;
-                      } else if (expectedAttemptsNum > 1000000) {
-                        return `High difficulty: Expected ~${(expectedAttemptsNum / 1000000).toFixed(1)}M attempts needed. Your contract's max_value is restrictive (${(probability * 100).toFixed(6)}% success rate).`;
-                      } else if (expectedAttemptsNum > 10000) {
-                        return `Medium difficulty: Expected ~${(expectedAttemptsNum / 1000).toFixed(0)}K attempts needed.`;
+                      if (expectedAttempts > 1000000000) {
+                        return `Very high difficulty: Expected ~${(expectedAttempts / 1000000000).toFixed(1)}B attempts needed. Your contract's max_value is very restrictive (${(probability * 100).toFixed(8)}% success rate). Consider using "Test Values" first to verify the calculation works.`;
+                      } else if (expectedAttempts > 1000000) {
+                        return `High difficulty: Expected ~${(expectedAttempts / 1000000).toFixed(1)}M attempts needed. Your contract's max_value is restrictive (${(probability * 100).toFixed(6)}% success rate).`;
+                      } else if (expectedAttempts > 10000) {
+                        return `Medium difficulty: Expected ~${(expectedAttempts / 1000).toFixed(0)}K attempts needed.`;
                       } else {
-                        return `Low difficulty: Expected ~${expectedAttemptsNum} attempts needed.`;
+                        return `Low difficulty: Expected ~${expectedAttempts.toFixed(0)} attempts needed.`;
                       }
                     } catch {
                       return 'Invalid max_value format.';

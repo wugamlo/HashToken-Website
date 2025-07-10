@@ -177,11 +177,14 @@ export class HashCalculator {
 
       // Calculate probability of finding a valid solution
       const maxPossibleHash = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
-      // Use BigInt arithmetic to avoid precision loss
-      const expectedAttempts = maxPossibleHash / this.maxValue;
-      const probability = 1.0 / Number(expectedAttempts);
+      // Convert to scientific notation for proper calculation (as done by other analysis)
+      const maxValueScientific = Number(this.maxValue);
+      const maxPossibleScientific = Number(maxPossibleHash);
+      const expectedAttempts = maxPossibleScientific / maxValueScientific;
+      const probability = 1.0 / expectedAttempts;
       console.log('Expected probability of finding valid hash:', probability);
-      console.log('Expected attempts needed:', expectedAttempts.toString());
+      console.log('Expected attempts needed:', expectedAttempts.toExponential());
+      console.log('Expected attempts (billions):', (expectedAttempts / 1e9).toFixed(1), 'billion');
     } catch (error) {
       console.error('Parameter parsing error:', error);
       throw new Error(`Invalid parameters: ${error.message}`);
