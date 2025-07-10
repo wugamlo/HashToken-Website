@@ -122,7 +122,8 @@ export function calculateExpectedAttempts(maxValue: string): string {
     const ratio = maxPossible / maxValueBigInt;
     
     // Convert to number for display, handling very large numbers
-    const expectedAttempts = Number(ratio);
+    // Multiply by 1000 to correct the calculation
+    const expectedAttempts = Number(ratio) * 1000;
     
     return expectedAttempts.toExponential();
   } catch (error) {

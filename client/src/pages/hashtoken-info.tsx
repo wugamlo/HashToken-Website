@@ -202,18 +202,8 @@ export default function HashTokenInfo() {
               <CardTitle className="text-sm font-medium">Total Supply</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatTokenAmount(contractState.totalSupply)}</div>
-              <p className="text-xs text-muted-foreground">HTK Tokens</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Mints</CardTitle>
-            </CardHeader>
-            <CardContent>
               <div className="text-2xl font-bold">{contractState.totalMints || 0}</div>
-              <p className="text-xs text-muted-foreground">Successful mines</p>
+              <p className="text-xs text-muted-foreground">HTK Tokens (1 per mint)</p>
             </CardContent>
           </Card>
         </div>
@@ -325,6 +315,48 @@ export default function HashTokenInfo() {
         </TabsContent>
 
         <TabsContent value="mining" className="space-y-6">
+          {/* Difficulty Progression Chart */}
+          {mintEvents && mintEvents.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Difficulty Progression</CardTitle>
+                <CardDescription>Visual representation of mining difficulty over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={mintEvents.slice(0, 20).reverse()}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(240, 3.7%, 15.9%)" />
+                    <XAxis 
+                      dataKey="blockNumber" 
+                      tickFormatter={(value) => `${Math.floor(value / 1000)}K`}
+                      stroke="hsl(240, 5%, 64.9%)"
+                    />
+                    <YAxis 
+                      stroke="hsl(240, 5%, 64.9%)"
+                      tickFormatter={(value) => `${value}%`}
+                    />
+                    <Tooltip 
+                      labelFormatter={(value) => `Block ${value.toLocaleString()}`}
+                      formatter={(value) => [`${value}%`, 'Difficulty']}
+                      contentStyle={{
+                        backgroundColor: 'hsl(240, 10%, 3.9%)',
+                        border: '1px solid hsl(240, 3.7%, 15.9%)',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="difficulty" 
+                      stroke="hsl(0, 72%, 51%)" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(0, 72%, 51%)', strokeWidth: 2, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+          
           <Card>
             <CardHeader>
               <CardTitle>Mining History</CardTitle>
@@ -342,6 +374,9 @@ export default function HashTokenInfo() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">Block {event.blockNumber.toLocaleString()}</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {parseFloat(event.difficulty || '0').toFixed(1)}% difficulty
+                          </Badge>
                           <span className="text-sm text-muted-foreground">
                             {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
                           </span>
