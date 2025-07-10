@@ -289,6 +289,43 @@ export default function HashTokenInfo() {
                     </div>
                   )}
                 </div>
+
+                <Separator />
+
+                {/* Trading Links */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium">Trading & Analytics</h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    <a 
+                      href="https://app.uniswap.org/explore/tokens/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">U</span>
+                        </div>
+                        <span className="text-sm font-medium">Trade on Uniswap</span>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </a>
+                    <a 
+                      href="https://www.dextools.io/app/en/ether/pair-explorer/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52?t=1752147961143"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">D</span>
+                        </div>
+                        <span className="text-sm font-medium">View on DexTools</span>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </a>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
