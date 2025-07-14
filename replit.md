@@ -146,6 +146,12 @@ Changelog:
 - July 10, 2025. Fixed refresh button functionality - now properly invalidates React Query caches and updates all data
 - July 10, 2025. Replaced meaningless Mining Trend Analysis with real Mining Activity Analysis showing authentic miner statistics
 - July 10, 2025. CALCULATION REVERT: Based on miner feedback, reverted expected attempts calculation from 717 billion back to 717 thousand
+- July 15, 2025. MAJOR UI RESTRUCTURING: Moved content-focused information to main page with HashToken logo integration
+- July 15, 2025. Enhanced miners section to show all 14 miners with clickable Etherscan links and dynamic count updates
+- July 15, 2025. Added trading links (Uniswap, DexTools) to dedicated Trading & Contract section with branded icons
+- July 15, 2025. Reorganized homepage to prioritize historical significance and educational content over technical details
+- July 15, 2025. Simplified tab structure: Mining History, Analytics, Hash Calculator (3 tabs instead of 4)
+- July 15, 2025. Integrated HashToken logo (golden coin with hashtag and "2016") while maintaining dark theme consistency
 ```
 
 ## User Preferences

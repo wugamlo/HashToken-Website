@@ -165,15 +165,53 @@ export default function HashTokenInfo() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header Section */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center space-x-2">
-          <Hash className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
-        </div>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          The first Ethereum token with proof-of-work minting logic, created on June 17, 2016
-        </p>
+      <div className="text-center space-y-6">
         <div className="flex items-center justify-center space-x-4">
+          <img 
+            src="/attached_assets/hashtoken_1752456164388.jpg" 
+            alt="HashToken Logo" 
+            className="h-16 w-16 rounded-full object-cover border-2 border-border"
+          />
+          <div>
+            <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
+            <p className="text-lg text-muted-foreground mt-1">The First Ethereum Mining Token</p>
+          </div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-semibold">Historic Significance</h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              HashToken was deployed on <strong>June 17, 2016</strong>, making it the first Ethereum token to implement 
+              proof-of-work mining logic. This pioneering contract introduced the concept of mining 
+              tokens directly on the Ethereum network, predating many modern mining token implementations.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">How It Works</h3>
+              <div className="space-y-2 text-muted-foreground">
+                <p>• <strong>Proof-of-Work Mining:</strong> Miners must find a hash value that meets the current difficulty target</p>
+                <p>• <strong>Dynamic Difficulty:</strong> The max_value decreases by 1% after each successful mint</p>
+                <p>• <strong>Keccak-256 Hash:</strong> Uses the same hashing algorithm as Ethereum</p>
+                <p>• <strong>Progressive Difficulty:</strong> Each mint makes the next one approximately 1% harder</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">Mining Process</h3>
+              <div className="space-y-2 text-muted-foreground">
+                <p>• <strong>Find Valid Hash:</strong> Calculate hash(value + prevHash) ≤ maxValue</p>
+                <p>• <strong>Submit Solution:</strong> Call mint() with your winning value</p>
+                <p>• <strong>Receive Reward:</strong> Get 1 HTK token for successful mining</p>
+                <p>• <strong>Increase Difficulty:</strong> Next miner faces 1% harder challenge</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center space-x-4 flex-wrap">
           <Badge variant="outline" className="text-sm">
             <Clock className="h-3 w-3 mr-1" />
             Historic Token
@@ -200,183 +238,183 @@ export default function HashTokenInfo() {
         </div>
       </div>
 
-      {/* Current State Overview */}
-      {contractState && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Current Max Value</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatLargeNumber(contractState.maxValue)}</div>
-              <p className="text-xs text-muted-foreground">Difficulty Target</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Expected Attempts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-500">
-                {formatExpectedAttempts(contractState.expectedAttempts)}
-              </div>
-              <p className="text-xs text-muted-foreground">For next mint</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Supply</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatTokenAmount(contractState.totalSupply)}</div>
-              <p className="text-xs text-muted-foreground">HTK Tokens (1 per mint)</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="mining">Mining History</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="about">About HTK</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Contract Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Database className="h-5 w-5" />
-                  <span>Contract Details</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Contract Address:</span>
-                    <a 
-                      href="https://etherscan.io/address/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-500 hover:underline flex items-center space-x-1"
-                    >
-                      <span>0xE5544a...31b0</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Token Name:</span>
-                    <span className="text-sm">HashToken</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Symbol:</span>
-                    <span className="text-sm">HTK</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Decimals:</span>
-                    <span className="text-sm">16</span>
-                  </div>
-                  {contractState && (
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">Current Block:</span>
-                      <span className="text-sm">{contractState.blockNumber.toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
-
-                <Separator />
-
-                {/* Trading Links */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium">Trading & Analytics</h4>
-                  <div className="grid grid-cols-1 gap-2">
-                    <a 
-                      href="https://app.uniswap.org/explore/tokens/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">U</span>
-                        </div>
-                        <span className="text-sm font-medium">Trade on Uniswap</span>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                    </a>
-                    <a 
-                      href="https://www.dextools.io/app/en/ether/pair-explorer/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52?t=1752147961143"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">D</span>
-                        </div>
-                        <span className="text-sm font-medium">View on DexTools</span>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                    </a>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Mining Activity */}
+      {/* Current State Overview & Trading Links */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Key Statistics */}
+        {contractState && (
+          <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Activity className="h-5 w-5" />
-                  <span>Recent Mining Activity</span>
+                  <span>Live Mining Statistics</span>
                 </CardTitle>
-                <CardDescription>Latest mint events on the network</CardDescription>
               </CardHeader>
               <CardContent>
-                {eventsLoading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center space-y-2">
+                    <div className="text-3xl font-bold">{formatLargeNumber(contractState.maxValue)}</div>
+                    <div className="text-sm text-muted-foreground">Current Max Value</div>
+                    <div className="text-xs text-muted-foreground">Difficulty Target</div>
                   </div>
-                ) : mintEvents && mintEvents.length > 0 ? (
-                  <div className="space-y-3">
-                    {mintEvents.slice(0, 5).map((event) => (
-                      <div key={event.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium">Block {event.blockNumber.toLocaleString()}</span>
-                            <Badge variant="secondary" className="text-xs">
-                              {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Miner: {event.minter.slice(0, 6)}...{event.minter.slice(-4)}
-                          </div>
-                        </div>
-                        <a 
-                          href={`https://etherscan.io/tx/${event.transactionHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </div>
-                    ))}
+                  <div className="text-center space-y-2">
+                    <div className="text-3xl font-bold text-orange-500">
+                      {formatExpectedAttempts(contractState.expectedAttempts)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Expected Attempts</div>
+                    <div className="text-xs text-muted-foreground">For next mint</div>
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No recent mining events found</p>
+                  <div className="text-center space-y-2">
+                    <div className="text-3xl font-bold text-green-600">
+                      {formatTokenAmount(contractState.totalSupply)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Total Supply</div>
+                    <div className="text-xs text-muted-foreground">HTK Tokens (1 per mint)</div>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {/* Trading & Contract Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <ExternalLink className="h-5 w-5" />
+              <span>Trading & Contract</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Contract Address */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Contract Address</div>
+              <a 
+                href="https://etherscan.io/address/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-500 hover:underline flex items-center space-x-1"
+              >
+                <span>0xE5544a...31b0</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+
+            <Separator />
+
+            {/* Trading Links */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Trading</div>
+              <div className="space-y-2">
+                <a 
+                  href="https://app.uniswap.org/explore/tokens/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2 bg-muted rounded hover:bg-muted/80 transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">U</span>
+                    </div>
+                    <span className="text-sm">Uniswap</span>
+                  </div>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+                <a 
+                  href="https://www.dextools.io/app/en/ether/pair-explorer/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52?t=1752147961143"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2 bg-muted rounded hover:bg-muted/80 transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">D</span>
+                    </div>
+                    <span className="text-sm">DexTools</span>
+                  </div>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Token Info */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Token Details</div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <div>Symbol: HTK</div>
+                <div>Decimals: 16</div>
+                <div>Created: June 17, 2016</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="mining" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="mining">Mining History</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="calculator">Hash Calculator</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="calculator" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Hash className="h-5 w-5" />
+                <span>Educational Hash Calculator</span>
+              </CardTitle>
+              <CardDescription>Learn about HashToken mining with our interactive calculator</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center space-y-4">
+                <div className="space-y-2">
+                  <p className="text-muted-foreground">
+                    Try our educational hash calculator to understand how HashToken mining works.
+                    This tool demonstrates the Keccak-256 hashing process and difficulty calculations.
+                  </p>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                    <Hash className="h-4 w-4" />
+                    <span>Educational tool for learning purposes</span>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <Button asChild size="lg">
+                    <a href="/hash-calculator">
+                      <Hash className="h-4 w-4 mr-2" />
+                      Open Hash Calculator
+                    </a>
+                  </Button>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Calculator Features</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Real-time hash calculations</li>
+                    <li>• Difficulty analysis</li>
+                    <li>• Performance metrics</li>
+                    <li>• Educational explanations</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium">Learn About</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Keccak-256 hashing</li>
+                    <li>• Proof-of-work mining</li>
+                    <li>• Difficulty progression</li>
+                    <li>• Expected attempts</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="mining" className="space-y-6">
@@ -577,85 +615,7 @@ export default function HashTokenInfo() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="about" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>About HashToken (HTK)</CardTitle>
-              <CardDescription>The historic first proof-of-work token on Ethereum</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Historical Significance</h3>
-                  <p className="text-muted-foreground">
-                    HashToken was deployed on June 17, 2016, making it the first Ethereum token to implement 
-                    proof-of-work mining logic. This pioneering contract introduced the concept of mining 
-                    tokens directly on the Ethereum network, predating many modern mining token implementations.
-                  </p>
-                </div>
 
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">How It Works</h3>
-                  <div className="space-y-2 text-muted-foreground">
-                    <p>• <strong>Proof-of-Work Mining:</strong> Miners must find a hash value that meets the current difficulty target</p>
-                    <p>• <strong>Dynamic Difficulty:</strong> The max_value decreases by 1% after each successful mint</p>
-                    <p>• <strong>Keccak-256 Hash:</strong> Uses the same hashing algorithm as Ethereum</p>
-                    <p>• <strong>Progressive Difficulty:</strong> Each mint makes the next one approximately 1% harder</p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Technical Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="font-medium">Creation Date:</span>
-                        <span>June 17, 2016</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Hash Algorithm:</span>
-                        <span>Keccak-256</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Difficulty Adjustment:</span>
-                        <span>1% per mint</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="font-medium">Token Standard:</span>
-                        <span>ERC-20</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Decimals:</span>
-                        <span>16</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Network:</span>
-                        <span>Ethereum Mainnet</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Current Status</h3>
-                  <p className="text-muted-foreground">
-                    HashToken continues to be actively mined today, with the difficulty having increased 
-                    significantly since its creation. The exponential difficulty growth makes each successive 
-                    mint exponentially more challenging, requiring billions of attempts for recent mints.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
