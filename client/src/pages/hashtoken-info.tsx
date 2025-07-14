@@ -168,7 +168,7 @@ export default function HashTokenInfo() {
       <div className="text-center space-y-6">
         <div className="flex items-center justify-center space-x-4">
           <img 
-            src="attached_assets/hashtoken_1752456164388.jpg" 
+            src="/hashtoken-logo.jpg" 
             alt="HashToken Logo" 
             className="h-16 w-16 rounded-full object-cover border-2 border-border"
           />

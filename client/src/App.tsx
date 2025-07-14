@@ -15,6 +15,7 @@ function Router() {
       <main>
         <Switch>
           <Route path="/" component={HashTokenInfo} />
+          <Route path="/hash-calculator" component={HashCalculator} />
           <Route component={NotFound} />
         </Switch>
       </main>
