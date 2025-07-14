@@ -168,7 +168,7 @@ export default function HashTokenInfo() {
       <div className="text-center space-y-6">
         <div className="flex items-center justify-center space-x-4">
           <img 
-            src="/attached_assets/hashtoken_1752456164388.jpg" 
+            src="attached_assets/hashtoken_1752456164388.jpg" 
             alt="HashToken Logo" 
             className="h-16 w-16 rounded-full object-cover border-2 border-border"
           />
@@ -188,7 +188,7 @@ export default function HashTokenInfo() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
             <div className="space-y-3">
               <h3 className="text-lg font-semibold">How It Works</h3>
               <div className="space-y-2 text-muted-foreground">
