@@ -365,44 +365,7 @@ export default function HashTokenInfo() {
 
 
 
-      {/* Additional Market Data - Only show if we have price data */}
-      {priceData && priceData.priceUsd && (
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5" />
-                <span>Market Data</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center space-y-2">
-                  <div className="text-2xl font-bold">
-                    ${priceData.liquidity ? (priceData.liquidity / 1000).toFixed(1) + 'K' : 'N/A'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Liquidity</div>
-                  <div className="text-xs text-muted-foreground">Total pool liquidity</div>
-                </div>
-                <div className="text-center space-y-2">
-                  <div className="text-2xl font-bold">
-                    ${priceData.volume24h ? (priceData.volume24h / 1000).toFixed(1) + 'K' : 'N/A'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Volume (24h)</div>
-                  <div className="text-xs text-muted-foreground">Trading volume</div>
-                </div>
-                <div className="text-center space-y-2">
-                  <div className="text-2xl font-bold">
-                    ${priceData.marketCap ? (priceData.marketCap / 1000000).toFixed(2) + 'M' : 'N/A'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Market Cap</div>
-                  <div className="text-xs text-muted-foreground">Total value</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+
 
       {/* Trading & Contract Information */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -427,17 +390,23 @@ export default function HashTokenInfo() {
                   </div>
                   <div className="text-center space-y-2">
                     <div className="text-2xl font-bold">
-                      ${priceData.volume24h ? (priceData.volume24h / 1000).toFixed(1) + 'K' : 'N/A'}
+                      ${priceData.volume24h ? (
+                        priceData.volume24h >= 1000 ? 
+                          (priceData.volume24h / 1000).toFixed(1) + 'K' : 
+                          priceData.volume24h.toFixed(0)
+                      ) : 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">Volume (24h)</div>
                     <div className="text-xs text-muted-foreground">Trading volume</div>
                   </div>
                   <div className="text-center space-y-2">
                     <div className="text-2xl font-bold">
-                      ${priceData.marketCap ? (priceData.marketCap / 1000000).toFixed(2) + 'M' : 'N/A'}
+                      ${contractState ? 
+                        Math.round(parseFloat(priceData.priceUsd) * parseInt(contractState.totalSupply)).toLocaleString() : 
+                        'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">Market Cap</div>
-                    <div className="text-xs text-muted-foreground">Total value</div>
+                    <div className="text-xs text-muted-foreground">Our calculation</div>
                   </div>
                 </div>
               </CardContent>
