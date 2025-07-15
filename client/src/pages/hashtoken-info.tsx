@@ -122,16 +122,9 @@ export default function HashTokenInfo() {
 
   const formatTokenAmount = (amount: string): string => {
     try {
-      // If the amount is already a simple number (not wei), return it directly
+      // The totalSupply from our API is already the correct number of tokens
       const num = parseInt(amount);
-      if (num < 1000000) {
-        return num.toLocaleString();
-      }
-      
-      // Otherwise, assume it's in wei and convert
-      const bigNum = BigInt(amount);
-      const tokens = bigNum / BigInt('1000000000000000000'); // Divide by 10^18
-      return tokens.toLocaleString();
+      return num.toLocaleString();
     } catch {
       return amount;
     }
