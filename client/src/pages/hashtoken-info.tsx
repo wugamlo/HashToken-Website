@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { ExternalLink, RefreshCw, Clock, Hash, TrendingUp, Activity, Database, Zap } from "lucide-react";
+import { ExternalLink, RefreshCw, Clock, Hash, TrendingUp, Activity, Database, Zap, DollarSign } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface ContractState {
