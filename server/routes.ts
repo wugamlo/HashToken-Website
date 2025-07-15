@@ -71,15 +71,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get token price from DexScreener API
+  // Get token price from DexScreener API using specific pair
   app.get("/api/contract/price", async (req, res) => {
     try {
-      const response = await fetch('https://api.dexscreener.com/tokens/v1/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0');
-      const data = await response.json();
+      // Try the specific pair first
+      const pairResponse = await fetch('https://api.dexscreener.com/latest/dex/pairs/ethereum/0x01C0aEAee4F9b9417237Aef3556bC1d7BD00eC52');
+      const pairData = await pairResponse.json();
       
-      if (data.pairs && data.pairs.length > 0) {
+      if (pairData.pair) {
+        const pair = pairData.pair;
+        res.json({
+          priceUsd: pair.priceUsd,
+          priceChange24h: pair.priceChange?.h24,
+          liquidity: pair.liquidity?.usd,
+          volume24h: pair.volume?.h24,
+          marketCap: pair.marketCap,
+          pairAddress: pair.pairAddress,
+          dexId: pair.dexId,
+          baseToken: pair.baseToken,
+          quoteToken: pair.quoteToken
+        });
+        return;
+      }
+      
+      // Fallback to token endpoint
+      const tokenResponse = await fetch('https://api.dexscreener.com/tokens/v1/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0');
+      const tokenData = await tokenResponse.json();
+      
+      if (tokenData.pairs && tokenData.pairs.length > 0) {
         // Find the pair with the highest liquidity (most reliable price)
-        const bestPair = data.pairs.reduce((best, current) => 
+        const bestPair = tokenData.pairs.reduce((best, current) => 
           (current.liquidity?.usd || 0) > (best.liquidity?.usd || 0) ? current : best
         );
         

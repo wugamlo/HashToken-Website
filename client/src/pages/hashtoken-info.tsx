@@ -192,68 +192,9 @@ export default function HashTokenInfo() {
             <p className="text-lg text-muted-foreground mt-1">The First Ethereum Mining Token</p>
           </div>
         </div>
-        
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="text-center space-y-4">
-            <h2 className="text-2xl font-semibold">Historic Significance</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              HashToken was deployed on <strong>June 17, 2016</strong>, making it the first Ethereum token to implement 
-              proof-of-work mining logic. This pioneering contract introduced the concept of mining 
-              tokens directly on the Ethereum network, predating many modern mining token implementations.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold">How It Works</h3>
-              <div className="space-y-2 text-muted-foreground">
-                <p>• <strong>Proof-of-Work Mining:</strong> Miners must find a hash value that meets the current difficulty target</p>
-                <p>• <strong>Dynamic Difficulty:</strong> The max_value decreases by 1% after each successful mint</p>
-                <p>• <strong>Keccak-256 Hash:</strong> Uses the same hashing algorithm as Ethereum</p>
-                <p>• <strong>Progressive Difficulty:</strong> Each mint makes the next one approximately 1% harder</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold">Mining Process</h3>
-              <div className="space-y-2 text-muted-foreground">
-                <p>• <strong>Find Valid Hash:</strong> Calculate hash(value + prevHash) ≤ maxValue</p>
-                <p>• <strong>Submit Solution:</strong> Call mint() with your winning value</p>
-                <p>• <strong>Receive Reward:</strong> Get 1 HTK token for successful mining</p>
-                <p>• <strong>Increase Difficulty:</strong> Next miner faces 1% harder challenge</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-center space-x-4 flex-wrap">
-          <Badge variant="outline" className="text-sm">
-            <Clock className="h-3 w-3 mr-1" />
-            Historic Token
-          </Badge>
-          <Badge variant="outline" className="text-sm">
-            <Activity className="h-3 w-3 mr-1" />
-            Active Mining
-          </Badge>
-          {contractState?.isOffline && (
-            <Badge variant="destructive" className="text-sm">
-              <Zap className="h-3 w-3 mr-1" />
-              Offline Data
-            </Badge>
-          )}
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            size="sm"
-            variant="outline"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh Data
-          </Button>
-        </div>
       </div>
 
-      {/* Key Metrics - Prioritized at Top */}
+      {/* Key Metrics - Moved Above Educational Content */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Current Supply */}
         {contractState && (
@@ -307,7 +248,7 @@ export default function HashTokenInfo() {
           </CardHeader>
           <CardContent>
             <div className="text-center space-y-2">
-              {priceData ? (
+              {priceData && priceData.priceUsd ? (
                 <>
                   <div className="text-4xl font-bold text-blue-600">
                     ${parseFloat(priceData.priceUsd).toFixed(8)}
@@ -321,14 +262,14 @@ export default function HashTokenInfo() {
                 </>
               ) : (
                 <div className="text-center space-y-2">
-                  <div className="text-2xl font-bold text-muted-foreground">No Active Trading</div>
-                  <div className="text-sm text-muted-foreground">Historic collectible token</div>
+                  <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+                  <div className="text-sm text-muted-foreground">Fetching price data</div>
                   <div className="text-xs text-muted-foreground">
-                    <a href="https://www.dextools.io/app/en/ether/pair-explorer/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52" 
+                    <a href="https://dexscreener.com/ethereum/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        className="text-blue-500 hover:underline">
-                      View on DexTools
+                      View on DexScreener
                     </a>
                   </div>
                 </div>
@@ -337,6 +278,140 @@ export default function HashTokenInfo() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Educational Content - Moved Below Metrics */}
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-semibold">Historic Significance</h2>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            HashToken was deployed on <strong>June 17, 2016</strong>, making it the first Ethereum token to implement 
+            proof-of-work mining logic. This pioneering contract introduced the concept of mining 
+            tokens directly on the Ethereum network, predating many modern mining token implementations.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">How It Works</h3>
+            <div className="space-y-2 text-muted-foreground">
+              <p>• <strong>Proof-of-Work Mining:</strong> Miners must find a hash value that meets the current difficulty target</p>
+              <p>• <strong>Dynamic Difficulty:</strong> The max_value decreases by 1% after each successful mint</p>
+              <p>• <strong>Keccak-256 Hash:</strong> Uses the same hashing algorithm as Ethereum</p>
+              <p>• <strong>Progressive Difficulty:</strong> Each mint makes the next one approximately 1% harder</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Mining Process</h3>
+            <div className="space-y-2 text-muted-foreground">
+              <p>• <strong>Find Valid Hash:</strong> Calculate hash(value + prevHash) ≤ maxValue</p>
+              <p>• <strong>Submit Solution:</strong> Call mint() with your winning value</p>
+              <p>• <strong>Receive Reward:</strong> Get 1 HTK token for successful mining</p>
+              <p>• <strong>Increase Difficulty:</strong> Next miner faces 1% harder challenge</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-center">
+        <div className="flex items-center justify-center space-x-4 flex-wrap">
+          <Badge variant="outline" className="text-sm">
+            <Clock className="h-3 w-3 mr-1" />
+            Historic Token
+          </Badge>
+          <Badge variant="outline" className="text-sm">
+            <Activity className="h-3 w-3 mr-1" />
+            Active Mining
+          </Badge>
+          {contractState?.isOffline && (
+            <Badge variant="destructive" className="text-sm">
+              <Zap className="h-3 w-3 mr-1" />
+              Offline Data
+            </Badge>
+          )}
+          <Button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            size="sm"
+            variant="outline"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
+      </div>
+
+      {/* Additional Market Data - Only show if we have price data */}
+      {priceData && priceData.priceUsd && (
+        <div className="max-w-4xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <TrendingUp className="h-5 w-5" />
+                <span>Market Data</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold">
+                    ${priceData.liquidity ? (priceData.liquidity / 1000).toFixed(1) + 'K' : 'N/A'}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Liquidity</div>
+                  <div className="text-xs text-muted-foreground">Total pool liquidity</div>
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold">
+                    ${priceData.volume24h ? (priceData.volume24h / 1000).toFixed(1) + 'K' : 'N/A'}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Volume (24h)</div>
+                  <div className="text-xs text-muted-foreground">Trading volume</div>
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold">
+                    ${priceData.marketCap ? (priceData.marketCap / 1000000).toFixed(2) + 'M' : 'N/A'}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Market Cap</div>
+                  <div className="text-xs text-muted-foreground">Total value</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Trading & Contract Information */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div></div>
+
+        <div className="flex items-center justify-center space-x-4 flex-wrap">
+          <Badge variant="outline" className="text-sm">
+            <Clock className="h-3 w-3 mr-1" />
+            Historic Token
+          </Badge>
+          <Badge variant="outline" className="text-sm">
+            <Activity className="h-3 w-3 mr-1" />
+            Active Mining
+          </Badge>
+          {contractState?.isOffline && (
+            <Badge variant="destructive" className="text-sm">
+              <Zap className="h-3 w-3 mr-1" />
+              Offline Data
+            </Badge>
+          )}
+          <Button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            size="sm"
+            variant="outline"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
+      </div>
+
+
 
       {/* Trading & Contract Information */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
