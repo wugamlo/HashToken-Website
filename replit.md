@@ -161,6 +161,8 @@ Changelog:
 - July 15, 2025. Fixed duplicate badges and refresh button display issue
 - July 15, 2025. Updated DexScreener API implementation to use specific pair endpoint with proper fallback logic
 - July 15, 2025. Enhanced price display to show both USD and ETH values when available (following DexScreener API best practices)
+- July 15, 2025. UI CLEANUP: Replaced red "# HashToken Info" header with refresh button positioned at top right
+- July 15, 2025. Simplified interface by removing badge duplicates and repositioning refresh functionality in header
 ```
 
 ## User Preferences

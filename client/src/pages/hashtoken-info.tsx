@@ -184,15 +184,31 @@ export default function HashTokenInfo() {
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header Section */}
       <div className="text-center space-y-6">
-        <div className="flex items-center justify-center space-x-4">
-          <img 
-            src="/hashtoken-logo.jpg" 
-            alt="HashToken Logo" 
-            className="h-16 w-16 rounded-full object-cover border-2 border-border"
-          />
-          <div>
-            <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
-            <p className="text-lg text-muted-foreground mt-1">The First Ethereum Mining Token</p>
+        <div className="relative">
+          <div className="flex items-center justify-center space-x-4">
+            <img 
+              src="/hashtoken-logo.jpg" 
+              alt="HashToken Logo" 
+              className="h-16 w-16 rounded-full object-cover border-2 border-border"
+            />
+            <div>
+              <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
+              <p className="text-lg text-muted-foreground mt-1">The First Ethereum Mining Token</p>
+            </div>
+          </div>
+          
+          {/* Refresh Button - Top Right */}
+          <div className="absolute top-0 right-0">
+            <Button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              size="sm"
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </Button>
           </div>
         </div>
       </div>
