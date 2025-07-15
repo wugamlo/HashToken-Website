@@ -152,6 +152,11 @@ Changelog:
 - July 15, 2025. Reorganized homepage to prioritize historical significance and educational content over technical details
 - July 15, 2025. Simplified tab structure: Mining History, Analytics, Hash Calculator (3 tabs instead of 4)
 - July 15, 2025. Integrated HashToken logo (golden coin with hashtag and "2016") while maintaining dark theme consistency
+- July 15, 2025. MAJOR FEATURE: Added live price integration via DexScreener API showing real-time USD price, 24h change, liquidity, and volume
+- July 15, 2025. Restructured landing page to prioritize Current Supply and Expected Attempts at top with prominent live price display
+- July 15, 2025. Removed Current Max Value from main page (technical metric moved to Analytics tab only)
+- July 15, 2025. Enhanced market data section with liquidity, volume, and market cap from DexScreener
+- July 15, 2025. Implemented comprehensive price refresh functionality integrated with existing data sync
 ```
 
 ## User Preferences

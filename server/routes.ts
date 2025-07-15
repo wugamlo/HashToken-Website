@@ -71,6 +71,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get token price from DexScreener API
+  app.get("/api/contract/price", async (req, res) => {
+    try {
+      const response = await fetch('https://api.dexscreener.com/tokens/v1/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0');
+      const data = await response.json();
+      
+      if (data.pairs && data.pairs.length > 0) {
+        // Find the pair with the highest liquidity (most reliable price)
+        const bestPair = data.pairs.reduce((best, current) => 
+          (current.liquidity?.usd || 0) > (best.liquidity?.usd || 0) ? current : best
+        );
+        
+        res.json({
+          priceUsd: bestPair.priceUsd,
+          priceChange24h: bestPair.priceChange?.h24,
+          liquidity: bestPair.liquidity?.usd,
+          volume24h: bestPair.volume?.h24,
+          marketCap: bestPair.marketCap,
+          pairAddress: bestPair.pairAddress,
+          dexId: bestPair.dexId
+        });
+      } else {
+        res.status(404).json({ error: "No trading pairs found" });
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+      res.status(500).json({ error: "Failed to fetch price data" });
+    }
+  });
+
   // Get historical contract states
   app.get("/api/contract/history", async (req, res) => {
     try {

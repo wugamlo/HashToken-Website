@@ -57,6 +57,19 @@ export default function HashTokenInfo() {
     queryFn: () => fetch('/api/contract/miners').then(res => res.json()),
   });
 
+  const { data: priceData, refetch: refetchPrice } = useQuery<{
+    priceUsd: string;
+    priceChange24h: number;
+    liquidity: number;
+    volume24h: number;
+    marketCap: number;
+    pairAddress: string;
+    dexId: string;
+  }>({
+    queryKey: ['/api/contract/price'],
+    queryFn: () => fetch('/api/contract/price').then(res => res.json()),
+  });
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -69,6 +82,7 @@ export default function HashTokenInfo() {
         queryClient.invalidateQueries({ queryKey: ['/api/contract/mint-events'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/contract/history'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/contract/miners'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/contract/price'] }),
       ]);
       
       // Also explicitly refetch to ensure immediate updates
@@ -76,6 +90,7 @@ export default function HashTokenInfo() {
         refetchState(),
         refetchMintEvents(),
         refetchHistory(),
+        refetchPrice(),
       ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -238,38 +253,125 @@ export default function HashTokenInfo() {
         </div>
       </div>
 
-      {/* Current State Overview & Trading Links */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Key Statistics */}
+      {/* Key Metrics - Prioritized at Top */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Current Supply */}
         {contractState && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-base">
+                <Database className="h-4 w-4" />
+                <span>Current Supply</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-2">
+                <div className="text-4xl font-bold text-green-600">
+                  {formatTokenAmount(contractState.totalSupply)}
+                </div>
+                <div className="text-sm text-muted-foreground">HTK Tokens</div>
+                <div className="text-xs text-muted-foreground">1 token per successful mint</div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Expected Attempts */}
+        {contractState && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-base">
+                <Hash className="h-4 w-4" />
+                <span>Expected Attempts</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-2">
+                <div className="text-4xl font-bold text-orange-500">
+                  {formatExpectedAttempts(contractState.expectedAttempts)}
+                </div>
+                <div className="text-sm text-muted-foreground">For Next Mint</div>
+                <div className="text-xs text-muted-foreground">Based on current difficulty</div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Live Price */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-base">
+              <TrendingUp className="h-4 w-4" />
+              <span>Live Price</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center space-y-2">
+              {priceData ? (
+                <>
+                  <div className="text-4xl font-bold text-blue-600">
+                    ${parseFloat(priceData.priceUsd).toFixed(8)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">USD per HTK</div>
+                  {priceData.priceChange24h && (
+                    <div className={`text-xs ${priceData.priceChange24h >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {priceData.priceChange24h >= 0 ? '+' : ''}{priceData.priceChange24h.toFixed(2)}% (24h)
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold text-muted-foreground">No Active Trading</div>
+                  <div className="text-sm text-muted-foreground">Historic collectible token</div>
+                  <div className="text-xs text-muted-foreground">
+                    <a href="https://www.dextools.io/app/en/ether/pair-explorer/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       className="text-blue-500 hover:underline">
+                      View on DexTools
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Trading & Contract Information */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Additional Price Info - Only show if we have price data */}
+        {priceData && priceData.priceUsd && (
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Activity className="h-5 w-5" />
-                  <span>Live Mining Statistics</span>
+                  <TrendingUp className="h-5 w-5" />
+                  <span>Market Data</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center space-y-2">
-                    <div className="text-3xl font-bold">{formatLargeNumber(contractState.maxValue)}</div>
-                    <div className="text-sm text-muted-foreground">Current Max Value</div>
-                    <div className="text-xs text-muted-foreground">Difficulty Target</div>
+                    <div className="text-2xl font-bold">
+                      ${priceData.liquidity ? (priceData.liquidity / 1000).toFixed(1) + 'K' : 'N/A'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Liquidity</div>
+                    <div className="text-xs text-muted-foreground">Total pool liquidity</div>
                   </div>
                   <div className="text-center space-y-2">
-                    <div className="text-3xl font-bold text-orange-500">
-                      {formatExpectedAttempts(contractState.expectedAttempts)}
+                    <div className="text-2xl font-bold">
+                      ${priceData.volume24h ? (priceData.volume24h / 1000).toFixed(1) + 'K' : 'N/A'}
                     </div>
-                    <div className="text-sm text-muted-foreground">Expected Attempts</div>
-                    <div className="text-xs text-muted-foreground">For next mint</div>
+                    <div className="text-sm text-muted-foreground">Volume (24h)</div>
+                    <div className="text-xs text-muted-foreground">Trading volume</div>
                   </div>
                   <div className="text-center space-y-2">
-                    <div className="text-3xl font-bold text-green-600">
-                      {formatTokenAmount(contractState.totalSupply)}
+                    <div className="text-2xl font-bold">
+                      ${priceData.marketCap ? (priceData.marketCap / 1000000).toFixed(2) + 'M' : 'N/A'}
                     </div>
-                    <div className="text-sm text-muted-foreground">Total Supply</div>
-                    <div className="text-xs text-muted-foreground">HTK Tokens (1 per mint)</div>
+                    <div className="text-sm text-muted-foreground">Market Cap</div>
+                    <div className="text-xs text-muted-foreground">Total value</div>
                   </div>
                 </div>
               </CardContent>
