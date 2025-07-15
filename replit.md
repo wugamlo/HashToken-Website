@@ -163,6 +163,8 @@ Changelog:
 - July 15, 2025. Enhanced price display to show both USD and ETH values when available (following DexScreener API best practices)
 - July 15, 2025. UI CLEANUP: Replaced red "# HashToken Info" header with refresh button positioned at top right
 - July 15, 2025. Simplified interface by removing badge duplicates and repositioning refresh functionality in header
+- July 15, 2025. MARKET CAP FEATURE: Added Market Cap calculation as fourth metric (Current Supply × Live Price in USD)
+- July 15, 2025. Enhanced metrics grid layout to 4 columns: Supply, Expected Attempts, Live Price, Market Cap
 ```
 
 ## User Preferences

@@ -207,7 +207,7 @@ export default function HashTokenInfo() {
       </div>
 
       {/* Key Metrics - Moved Above Educational Content */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Current Supply */}
         {contractState && (
           <Card>
@@ -288,6 +288,42 @@ export default function HashTokenInfo() {
                        className="text-blue-500 hover:underline">
                       View on DexScreener
                     </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Market Cap */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-base">
+              <DollarSign className="h-4 w-4" />
+              <span>Market Cap</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center space-y-2">
+              {priceData && priceData.priceUsd && contractState ? (
+                <>
+                  <div className="text-4xl font-bold text-purple-600">
+                    ${(parseFloat(priceData.priceUsd) * parseInt(contractState.totalSupply)).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total Value</div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatTokenAmount(contractState.totalSupply)} × ${parseFloat(priceData.priceUsd).toFixed(8)}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold text-muted-foreground">N/A</div>
+                  <div className="text-sm text-muted-foreground">No price data</div>
+                  <div className="text-xs text-muted-foreground">
+                    Requires active trading pairs
                   </div>
                 </div>
               )}
