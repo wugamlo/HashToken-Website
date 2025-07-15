@@ -59,12 +59,15 @@ export default function HashTokenInfo() {
 
   const { data: priceData, refetch: refetchPrice } = useQuery<{
     priceUsd: string;
+    priceNative: string;
     priceChange24h: number;
     liquidity: number;
     volume24h: number;
     marketCap: number;
     pairAddress: string;
     dexId: string;
+    baseToken: any;
+    quoteToken: any;
   }>({
     queryKey: ['/api/contract/price'],
     queryFn: () => fetch('/api/contract/price').then(res => res.json()),
@@ -254,6 +257,11 @@ export default function HashTokenInfo() {
                     ${parseFloat(priceData.priceUsd).toFixed(8)}
                   </div>
                   <div className="text-sm text-muted-foreground">USD per HTK</div>
+                  {priceData.priceNative && (
+                    <div className="text-xs text-muted-foreground">
+                      {parseFloat(priceData.priceNative).toFixed(6)} ETH
+                    </div>
+                  )}
                   {priceData.priceChange24h && (
                     <div className={`text-xs ${priceData.priceChange24h >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {priceData.priceChange24h >= 0 ? '+' : ''}{priceData.priceChange24h.toFixed(2)}% (24h)
@@ -262,8 +270,8 @@ export default function HashTokenInfo() {
                 </>
               ) : (
                 <div className="text-center space-y-2">
-                  <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
-                  <div className="text-sm text-muted-foreground">Fetching price data</div>
+                  <div className="text-2xl font-bold text-muted-foreground">No Active Trading</div>
+                  <div className="text-sm text-muted-foreground">Historic collectible token</div>
                   <div className="text-xs text-muted-foreground">
                     <a href="https://dexscreener.com/ethereum/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52" 
                        target="_blank" 
@@ -313,33 +321,7 @@ export default function HashTokenInfo() {
         </div>
       </div>
 
-      <div className="text-center">
-        <div className="flex items-center justify-center space-x-4 flex-wrap">
-          <Badge variant="outline" className="text-sm">
-            <Clock className="h-3 w-3 mr-1" />
-            Historic Token
-          </Badge>
-          <Badge variant="outline" className="text-sm">
-            <Activity className="h-3 w-3 mr-1" />
-            Active Mining
-          </Badge>
-          {contractState?.isOffline && (
-            <Badge variant="destructive" className="text-sm">
-              <Zap className="h-3 w-3 mr-1" />
-              Offline Data
-            </Badge>
-          )}
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            size="sm"
-            variant="outline"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh Data
-          </Button>
-        </div>
-      </div>
+
 
       {/* Additional Market Data - Only show if we have price data */}
       {priceData && priceData.priceUsd && (
@@ -379,39 +361,6 @@ export default function HashTokenInfo() {
           </Card>
         </div>
       )}
-
-      {/* Trading & Contract Information */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div></div>
-
-        <div className="flex items-center justify-center space-x-4 flex-wrap">
-          <Badge variant="outline" className="text-sm">
-            <Clock className="h-3 w-3 mr-1" />
-            Historic Token
-          </Badge>
-          <Badge variant="outline" className="text-sm">
-            <Activity className="h-3 w-3 mr-1" />
-            Active Mining
-          </Badge>
-          {contractState?.isOffline && (
-            <Badge variant="destructive" className="text-sm">
-              <Zap className="h-3 w-3 mr-1" />
-              Offline Data
-            </Badge>
-          )}
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            size="sm"
-            variant="outline"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh Data
-          </Button>
-        </div>
-      </div>
-
-
 
       {/* Trading & Contract Information */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

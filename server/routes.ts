@@ -74,14 +74,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get token price from DexScreener API using specific pair
   app.get("/api/contract/price", async (req, res) => {
     try {
-      // Try the specific pair first
-      const pairResponse = await fetch('https://api.dexscreener.com/latest/dex/pairs/ethereum/0x01C0aEAee4F9b9417237Aef3556bC1d7BD00eC52');
-      const pairData = await pairResponse.json();
+      // Use the correct API endpoint format as suggested
+      const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/ethereum/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52');
+      const data = await response.json();
       
-      if (pairData.pair) {
-        const pair = pairData.pair;
+      if (data.pairs && data.pairs.length > 0) {
+        const pair = data.pairs[0]; // Get first pair as suggested
         res.json({
           priceUsd: pair.priceUsd,
+          priceNative: pair.priceNative, // Price in ETH
           priceChange24h: pair.priceChange?.h24,
           liquidity: pair.liquidity?.usd,
           volume24h: pair.volume?.h24,
@@ -94,18 +95,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       
-      // Fallback to token endpoint
+      // If no pairs found, try token endpoint as fallback
       const tokenResponse = await fetch('https://api.dexscreener.com/tokens/v1/ethereum/0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0');
       const tokenData = await tokenResponse.json();
       
       if (tokenData.pairs && tokenData.pairs.length > 0) {
-        // Find the pair with the highest liquidity (most reliable price)
         const bestPair = tokenData.pairs.reduce((best, current) => 
           (current.liquidity?.usd || 0) > (best.liquidity?.usd || 0) ? current : best
         );
         
         res.json({
           priceUsd: bestPair.priceUsd,
+          priceNative: bestPair.priceNative,
           priceChange24h: bestPair.priceChange?.h24,
           liquidity: bestPair.liquidity?.usd,
           volume24h: bestPair.volume?.h24,

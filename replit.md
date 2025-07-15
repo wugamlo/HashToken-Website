@@ -157,6 +157,10 @@ Changelog:
 - July 15, 2025. Removed Current Max Value from main page (technical metric moved to Analytics tab only)
 - July 15, 2025. Enhanced market data section with liquidity, volume, and market cap from DexScreener
 - July 15, 2025. Implemented comprehensive price refresh functionality integrated with existing data sync
+- July 15, 2025. LAYOUT OPTIMIZATION: Moved key metrics (Supply, Expected Attempts, Price) above educational content as requested
+- July 15, 2025. Fixed duplicate badges and refresh button display issue
+- July 15, 2025. Updated DexScreener API implementation to use specific pair endpoint with proper fallback logic
+- July 15, 2025. Enhanced price display to show both USD and ETH values when available (following DexScreener API best practices)
 ```
 
 ## User Preferences
