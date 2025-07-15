@@ -165,6 +165,7 @@ Changelog:
 - July 15, 2025. Simplified interface by removing badge duplicates and repositioning refresh functionality in header
 - July 15, 2025. MARKET CAP FEATURE: Added Market Cap calculation as fourth metric (Current Supply × Live Price in USD)
 - July 15, 2025. Enhanced metrics grid layout to 4 columns: Supply, Expected Attempts, Live Price, Market Cap
+- July 15, 2025. PRICE FORMAT OPTIMIZATION: Live price shows 2 decimals, Market Cap shows whole dollars (no decimals)
 ```
 
 ## User Preferences

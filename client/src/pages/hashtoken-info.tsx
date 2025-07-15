@@ -263,7 +263,7 @@ export default function HashTokenInfo() {
               {priceData && priceData.priceUsd ? (
                 <>
                   <div className="text-4xl font-bold text-blue-600">
-                    ${parseFloat(priceData.priceUsd).toFixed(8)}
+                    ${parseFloat(priceData.priceUsd).toFixed(2)}
                   </div>
                   <div className="text-sm text-muted-foreground">USD per HTK</div>
                   {priceData.priceNative && (
@@ -308,14 +308,11 @@ export default function HashTokenInfo() {
               {priceData && priceData.priceUsd && contractState ? (
                 <>
                   <div className="text-4xl font-bold text-purple-600">
-                    ${(parseFloat(priceData.priceUsd) * parseInt(contractState.totalSupply)).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
+                    ${Math.round(parseFloat(priceData.priceUsd) * parseInt(contractState.totalSupply)).toLocaleString()}
                   </div>
                   <div className="text-sm text-muted-foreground">Total Value</div>
                   <div className="text-xs text-muted-foreground">
-                    {formatTokenAmount(contractState.totalSupply)} × ${parseFloat(priceData.priceUsd).toFixed(8)}
+                    {formatTokenAmount(contractState.totalSupply)} × ${parseFloat(priceData.priceUsd).toFixed(2)}
                   </div>
                 </>
               ) : (
