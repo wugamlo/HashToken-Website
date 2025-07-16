@@ -198,6 +198,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auto-sync endpoint for regular background sync
+  app.post("/api/contract/auto-sync", async (req, res) => {
+    try {
+      // Use smaller block range for regular sync
+      const events = await getRecentMintEvents(-2000);
+      let syncedCount = 0;
+      
+      for (const event of events) {
+        const existing = await storage.getMintEventByHash(event.transactionHash);
+        if (!existing) {
+          const mintIndex = await storage.getRecentMintEvents(9999);
+          const baseDifficulty = 90;
+          const difficultyIncrement = 0.001;
+          const simulatedDifficulty = (baseDifficulty + (mintIndex.length * difficultyIncrement)).toFixed(4);
+          
+          await storage.insertMintEvent({
+            blockNumber: event.blockNumber,
+            transactionHash: event.transactionHash,
+            minter: event.minter,
+            timestamp: event.timestamp,
+            gasUsed: event.gasUsed,
+            gasPrice: event.gasPrice,
+            difficulty: simulatedDifficulty,
+            expectedAttempts: calculateExpectedAttempts("100000"),
+          });
+          syncedCount++;
+        }
+      }
+      
+      res.json({ 
+        synced: syncedCount, 
+        total: events.length, 
+        message: `Auto-sync completed: ${syncedCount} new events added` 
+      });
+    } catch (error) {
+      console.error("Error in auto-sync:", error);
+      res.status(500).json({ error: "Failed to auto-sync mint events" });
+    }
+  });
+
   // Migration endpoint to import historical transactions
   app.post("/api/migrate-historical", async (req, res) => {
     try {

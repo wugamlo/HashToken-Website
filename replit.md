@@ -184,6 +184,9 @@ Changelog:
 - July 16, 2025. CRITICAL FIX: Identified 19 "mint" transactions were actually Uniswap swaps incorrectly imported by blockchain sync
 - July 16, 2025. Removed 19 incorrect transactions from dataset and fixed blockchain sync validation
 - July 16, 2025. FINAL ACCURATE COUNT: 2,726 HTK tokens total supply (matches user's filtered CSV export perfectly)
+- July 16, 2025. SYNC SYSTEM REPAIR: Fixed overly strict validation that was blocking all new mint transactions
+- July 16, 2025. Added automatic sync every 5 minutes to keep mint count updated with latest blockchain events
+- July 16, 2025. Verified all recent transactions are legitimate HashToken mint events (not Uniswap swaps)
 ```
 
 ## User Preferences

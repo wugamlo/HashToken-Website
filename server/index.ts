@@ -66,5 +66,22 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Set up automatic sync every 5 minutes
+    setInterval(async () => {
+      try {
+        console.log('Running automatic sync...');
+        const response = await fetch('http://localhost:5000/api/contract/auto-sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        if (result.synced > 0) {
+          console.log(`Auto-sync: ${result.synced} new mint events added`);
+        }
+      } catch (error) {
+        console.error('Auto-sync failed:', error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
   });
 })();
