@@ -22,7 +22,7 @@ export function loadHistoricalTransactionHashes(): Set<string> {
   try {
     const transactionHashes = new Set<string>();
     
-    // Load the main CSV file (correction file has 100% overlap with main file)
+    // Load the main CSV file (keeping the more complete dataset)
     const csvFiles = [
       'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv'
     ];
@@ -84,7 +84,7 @@ export async function migrateHistoricalTransactions(): Promise<number> {
   try {
     let migratedCount = 0;
     
-    // Process the main CSV file (correction file has 100% overlap with main file)
+    // Process the main CSV file (keeping the more complete dataset)
     const csvFiles = [
       'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv'
     ];
