@@ -1,0 +1,77 @@
+import { DatabaseStorage } from "./storage";
+import { MemoryStorage } from "./memory-storage";
+
+export async function migrateToMemoryStorage(): Promise<void> {
+  console.log("Starting migration from PostgreSQL to memory storage...");
+  
+  const dbStorage = new DatabaseStorage();
+  const memoryStorage = new MemoryStorage();
+  
+  try {
+    // Clear existing memory storage
+    await memoryStorage.clearAllData();
+    
+    // Migrate mint events
+    console.log("Migrating mint events...");
+    const allMintEvents = await dbStorage.getRecentMintEvents(10000); // Get all events
+    console.log(`Found ${allMintEvents.length} mint events to migrate`);
+    
+    // Process in batches for better performance
+    const batchSize = 100;
+    for (let i = 0; i < allMintEvents.length; i += batchSize) {
+      const batch = allMintEvents.slice(i, i + batchSize);
+      const insertEvents = batch.map(event => ({
+        blockNumber: event.blockNumber,
+        transactionHash: event.transactionHash,
+        minter: event.minter,
+        timestamp: event.timestamp,
+        gasUsed: event.gasUsed || '',
+        gasPrice: event.gasPrice || '',
+        difficulty: event.difficulty || '',
+        expectedAttempts: event.expectedAttempts || '',
+      }));
+      
+      await memoryStorage.insertMintEventsBatch(insertEvents);
+      if (i % 500 === 0) {
+        console.log(`Migrated ${i + batch.length} of ${allMintEvents.length} events`);
+      }
+    }
+    
+    // Migrate contract states
+    console.log("Migrating contract state...");
+    const currentState = await dbStorage.getCurrentContractState();
+    if (currentState) {
+      await memoryStorage.updateContractState({
+        blockNumber: currentState.blockNumber,
+        maxValue: currentState.maxValue,
+        prevHash: currentState.prevHash,
+        totalSupply: currentState.totalSupply,
+      });
+      console.log("Contract state migrated successfully");
+    }
+    
+    // Note: We're not migrating users since they're likely not critical
+    // and authentication can be rebuilt if needed
+    
+    console.log("Migration completed successfully!");
+    console.log(`- ${allMintEvents.length} mint events migrated`);
+    console.log(`- ${currentState ? 1 : 0} contract state migrated`);
+    
+  } catch (error) {
+    console.error("Migration failed:", error);
+    throw error;
+  }
+}
+
+// Run migration if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  migrateToMemoryStorage()
+    .then(() => {
+      console.log("Migration script completed successfully");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Migration script failed:", error);
+      process.exit(1);
+    });
+}

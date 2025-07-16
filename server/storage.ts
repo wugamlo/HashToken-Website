@@ -1,4 +1,7 @@
-import { users, contractState, mintEvents, type User, type InsertUser, type ContractState, type InsertContractState, type MintEvent, type InsertMintEvent } from "@shared/schema";
+import { type User, type InsertUser, type ContractState, type InsertContractState, type MintEvent, type InsertMintEvent } from "@shared/schema";
+import { MemoryStorage } from "./memory-storage";
+// Keep the old DatabaseStorage for migration purposes if needed
+import { users, contractState, mintEvents } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, gte } from "drizzle-orm";
 
@@ -91,4 +94,4 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemoryStorage();

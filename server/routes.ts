@@ -220,6 +220,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Migration endpoint to move data from PostgreSQL to memory storage
+  app.post("/api/migrate-to-memory", async (req, res) => {
+    try {
+      const { migrateToMemoryStorage } = await import("./migrate-to-memory");
+      await migrateToMemoryStorage();
+      res.json({ 
+        success: true,
+        message: "Successfully migrated data from PostgreSQL to memory storage" 
+      });
+    } catch (error) {
+      console.error("Error during memory migration:", error);
+      res.status(500).json({ error: "Failed to migrate to memory storage" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

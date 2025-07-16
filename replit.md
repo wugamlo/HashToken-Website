@@ -16,9 +16,9 @@ This is a comprehensive full-stack TypeScript web application that provides deta
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Drizzle ORM
-- **Database Provider**: Neon Database (serverless PostgreSQL)
-- **Session Management**: PostgreSQL-backed sessions
+- **Database**: In-memory storage with JSON file persistence
+- **Data Persistence**: JSON file backup for server restarts
+- **Session Management**: Memory-based (lightweight for current usage)
 
 ### UI Component System
 - **Base**: shadcn/ui components built on Radix UI primitives
@@ -42,12 +42,12 @@ This is a comprehensive full-stack TypeScript web application that provides deta
   - Performance metrics (rate, elapsed time)
   - Export functionality for results
 
-### Database Schema
-- **Users Table**: Basic user management with username/password authentication
-- **Contract State Table**: Stores historical contract states and difficulty progression
-- **Mint Events Table**: Records all mining events with gas usage, timestamps, and miner addresses
-- **Schema Location**: `shared/schema.ts` for type-safe database operations
-- **Migration System**: Drizzle Kit for schema migrations
+### Data Storage
+- **Users Collection**: Basic user management with username/password authentication
+- **Contract State Collection**: Stores historical contract states and difficulty progression
+- **Mint Events Collection**: Records all mining events with gas usage, timestamps, and miner addresses
+- **Schema Location**: `shared/schema.ts` for type-safe data operations
+- **Persistence**: JSON file backup with automatic save on data changes
 
 ### API Structure
 - **Route Prefix**: All API endpoints use `/api` prefix
@@ -112,9 +112,9 @@ This is a comprehensive full-stack TypeScript web application that provides deta
 - **Database**: PostgreSQL with connection pooling
 
 ### Environment Configuration
-- **DATABASE_URL**: PostgreSQL connection string (required)
 - **NODE_ENV**: Environment flag for development/production modes
-- **Session Storage**: PostgreSQL-backed sessions with connect-pg-simple
+- **Data Persistence**: JSON file storage (storage-data.json)
+- **Session Storage**: Memory-based sessions (no external database required)
 
 ## Changelog
 
@@ -166,6 +166,9 @@ Changelog:
 - July 15, 2025. MARKET CAP FEATURE: Added Market Cap calculation as fourth metric (Current Supply × Live Price in USD)
 - July 15, 2025. Enhanced metrics grid layout to 4 columns: Supply, Expected Attempts, Live Price, Market Cap
 - July 15, 2025. PRICE FORMAT OPTIMIZATION: Live price shows 2 decimals, Market Cap shows whole dollars (no decimals)
+- July 16, 2025. COST OPTIMIZATION: Migrated from PostgreSQL to in-memory storage with JSON file persistence
+- July 16, 2025. Successfully migrated all 2,754 mint events and contract states to memory storage
+- July 16, 2025. Eliminated database costs while maintaining full functionality and improved performance
 ```
 
 ## User Preferences
