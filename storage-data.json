@@ -1,47 +1,5 @@
 {
   "users": [],
-  "contractStates": [
-    {
-      "id": 1,
-      "blockNumber": 22928410,
-      "maxValue": "49925998798622914788966611068635446525489418661592333041123425709",
-      "prevHash": "0xf10c686354c3a12c5105b2e1cd78ef74eed7e5a5de364f8e78ead3ece8257444",
-      "totalSupply": "2754",
-      "lastUpdated": "2025-07-16T01:27:56.356Z"
-    },
-    {
-      "id": 2,
-      "blockNumber": 22928463,
-      "maxValue": "49426738810636685641076944957949092060234524474976409710712191452",
-      "prevHash": "0xc2f511ed21c22f20f8f1b6bb42d67ba48b667670563ccdff5d6cef7b12dfb068",
-      "totalSupply": "2754",
-      "lastUpdated": "2025-07-16T01:28:03.335Z"
-    },
-    {
-      "id": 3,
-      "blockNumber": 22928463,
-      "maxValue": "49426738810636685641076944957949092060234524474976409710712191452",
-      "prevHash": "0xc2f511ed21c22f20f8f1b6bb42d67ba48b667670563ccdff5d6cef7b12dfb068",
-      "totalSupply": "2754",
-      "lastUpdated": "2025-07-16T01:28:05.322Z"
-    },
-    {
-      "id": 4,
-      "blockNumber": 22928468,
-      "maxValue": "49426738810636685641076944957949092060234524474976409710712191452",
-      "prevHash": "0xc2f511ed21c22f20f8f1b6bb42d67ba48b667670563ccdff5d6cef7b12dfb068",
-      "totalSupply": "2754",
-      "lastUpdated": "2025-07-16T01:29:05.246Z"
-    },
-    {
-      "id": 5,
-      "blockNumber": 22928468,
-      "maxValue": "49426738810636685641076944957949092060234524474976409710712191452",
-      "prevHash": "0xc2f511ed21c22f20f8f1b6bb42d67ba48b667670563ccdff5d6cef7b12dfb068",
-      "totalSupply": "2754",
-      "lastUpdated": "2025-07-16T01:29:05.898Z"
-    }
-  ],
   "mintEvents": [
     {
       "id": 1,
@@ -30340,7 +30298,6 @@
   ],
   "nextIds": {
     "users": 1,
-    "contractStates": 6,
     "mintEvents": 2755
   }
 }

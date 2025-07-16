@@ -1,7 +1,7 @@
-import { type User, type InsertUser, type ContractState, type InsertContractState, type MintEvent, type InsertMintEvent } from "@shared/schema";
+import { type User, type InsertUser, type MintEvent, type InsertMintEvent } from "@shared/schema";
 import { MemoryStorage } from "./memory-storage";
 // Keep the old DatabaseStorage for migration purposes if needed
-import { users, contractState, mintEvents } from "@shared/schema";
+import { users, mintEvents } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, gte } from "drizzle-orm";
 
@@ -9,10 +9,6 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
-  // Contract state methods
-  getCurrentContractState(): Promise<ContractState | undefined>;
-  updateContractState(state: InsertContractState): Promise<ContractState>;
   
   // Mint events methods
   getRecentMintEvents(limit?: number): Promise<MintEvent[]>;
@@ -40,22 +36,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getCurrentContractState(): Promise<ContractState | undefined> {
-    const [state] = await db
-      .select()
-      .from(contractState)
-      .orderBy(desc(contractState.lastUpdated))
-      .limit(1);
-    return state || undefined;
-  }
 
-  async updateContractState(state: InsertContractState): Promise<ContractState> {
-    const [newState] = await db
-      .insert(contractState)
-      .values(state)
-      .returning();
-    return newState;
-  }
 
   async getRecentMintEvents(limit: number = 50): Promise<MintEvent[]> {
     const events = await db

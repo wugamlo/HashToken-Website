@@ -44,10 +44,10 @@ This is a comprehensive full-stack TypeScript web application that provides deta
 
 ### Data Storage
 - **Users Collection**: Basic user management with username/password authentication
-- **Contract State Collection**: Stores historical contract states and difficulty progression
-- **Mint Events Collection**: Records all mining events with gas usage, timestamps, and miner addresses
+- **Mint Events Collection**: Records all mining events with gas usage, timestamps, and miner addresses (single source of truth)
 - **Schema Location**: `shared/schema.ts` for type-safe data operations
 - **Persistence**: JSON file backup with automatic save on data changes
+- **Contract Data**: Calculated live from Ethereum blockchain (no storage needed)
 
 ### API Structure
 - **Route Prefix**: All API endpoints use `/api` prefix
@@ -167,8 +167,11 @@ Changelog:
 - July 15, 2025. Enhanced metrics grid layout to 4 columns: Supply, Expected Attempts, Live Price, Market Cap
 - July 15, 2025. PRICE FORMAT OPTIMIZATION: Live price shows 2 decimals, Market Cap shows whole dollars (no decimals)
 - July 16, 2025. COST OPTIMIZATION: Migrated from PostgreSQL to in-memory storage with JSON file persistence
-- July 16, 2025. Successfully migrated all 2,754 mint events and contract states to memory storage
+- July 16, 2025. Successfully migrated all 2,754 mint events to memory storage
 - July 16, 2025. Eliminated database costs while maintaining full functionality and improved performance
+- July 16, 2025. ARCHITECTURE CLEANUP: Removed redundant contract state storage table for cleaner, leaner application
+- July 16, 2025. Contract data now calculated live from Ethereum blockchain instead of storing random snapshots
+- July 16, 2025. Streamlined data model to single source of truth: mint events only
 ```
 
 ## User Preferences

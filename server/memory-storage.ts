@@ -1,15 +1,13 @@
 import { writeFileSync, readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { type User, type InsertUser, type ContractState, type InsertContractState, type MintEvent, type InsertMintEvent } from "@shared/schema";
+import { type User, type InsertUser, type MintEvent, type InsertMintEvent } from "@shared/schema";
 import { type IStorage } from "./storage";
 
 interface StorageData {
   users: User[];
-  contractStates: ContractState[];
   mintEvents: MintEvent[];
   nextIds: {
     users: number;
-    contractStates: number;
     mintEvents: number;
   };
 }
@@ -17,11 +15,9 @@ interface StorageData {
 export class MemoryStorage implements IStorage {
   private data: StorageData = {
     users: [],
-    contractStates: [],
     mintEvents: [],
     nextIds: {
       users: 1,
-      contractStates: 1,
       mintEvents: 1,
     },
   };
@@ -44,7 +40,7 @@ export class MemoryStorage implements IStorage {
             }
             return value;
           });
-          console.log(`Loaded data from ${this.dataFile}: ${this.data.mintEvents.length} mint events, ${this.data.contractStates.length} contract states, ${this.data.users.length} users`);
+          console.log(`Loaded data from ${this.dataFile}: ${this.data.mintEvents.length} mint events, ${this.data.users.length} users`);
         } else {
           console.log('Empty data file, starting with fresh data');
         }
@@ -80,24 +76,7 @@ export class MemoryStorage implements IStorage {
     return newUser;
   }
 
-  async getCurrentContractState(): Promise<ContractState | undefined> {
-    // Sort by lastUpdated descending and return the first one
-    const sorted = [...this.data.contractStates].sort((a, b) => 
-      new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
-    );
-    return sorted[0];
-  }
 
-  async updateContractState(state: InsertContractState): Promise<ContractState> {
-    const newState: ContractState = {
-      id: this.data.nextIds.contractStates++,
-      ...state,
-      lastUpdated: new Date(),
-    };
-    this.data.contractStates.push(newState);
-    this.saveToFile();
-    return newState;
-  }
 
   async getRecentMintEvents(limit: number = 50): Promise<MintEvent[]> {
     // Sort by timestamp descending and limit results
@@ -156,11 +135,9 @@ export class MemoryStorage implements IStorage {
   async clearAllData(): Promise<void> {
     this.data = {
       users: [],
-      contractStates: [],
       mintEvents: [],
       nextIds: {
         users: 1,
-        contractStates: 1,
         mintEvents: 1,
       },
     };

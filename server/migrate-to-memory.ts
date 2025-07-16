@@ -37,25 +37,12 @@ export async function migrateToMemoryStorage(): Promise<void> {
       }
     }
     
-    // Migrate contract states
-    console.log("Migrating contract state...");
-    const currentState = await dbStorage.getCurrentContractState();
-    if (currentState) {
-      await memoryStorage.updateContractState({
-        blockNumber: currentState.blockNumber,
-        maxValue: currentState.maxValue,
-        prevHash: currentState.prevHash,
-        totalSupply: currentState.totalSupply,
-      });
-      console.log("Contract state migrated successfully");
-    }
-    
     // Note: We're not migrating users since they're likely not critical
     // and authentication can be rebuilt if needed
+    // Note: Contract states are no longer stored - they're calculated live from blockchain
     
     console.log("Migration completed successfully!");
     console.log(`- ${allMintEvents.length} mint events migrated`);
-    console.log(`- ${currentState ? 1 : 0} contract state migrated`);
     
   } catch (error) {
     console.error("Migration failed:", error);

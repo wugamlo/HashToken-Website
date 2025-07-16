@@ -8,14 +8,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
-export const contractState = pgTable("contract_state", {
-  id: serial("id").primaryKey(),
-  blockNumber: integer("block_number").notNull(),
-  maxValue: text("max_value").notNull(),
-  prevHash: text("prev_hash").notNull(),
-  totalSupply: text("total_supply").notNull(),
-  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
-});
+// Contract state removed - data is now calculated live from blockchain
 
 export const mintEvents = pgTable("mint_events", {
   id: serial("id").primaryKey(),
@@ -34,12 +27,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-export const insertContractStateSchema = createInsertSchema(contractState).pick({
-  blockNumber: true,
-  maxValue: true,
-  prevHash: true,
-  totalSupply: true,
-});
+// Contract state schema removed - data is now calculated live
 
 export const insertMintEventSchema = createInsertSchema(mintEvents).pick({
   blockNumber: true,
@@ -54,7 +42,5 @@ export const insertMintEventSchema = createInsertSchema(mintEvents).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type ContractState = typeof contractState.$inferSelect;
-export type InsertContractState = z.infer<typeof insertContractStateSchema>;
 export type MintEvent = typeof mintEvents.$inferSelect;
 export type InsertMintEvent = z.infer<typeof insertMintEventSchema>;

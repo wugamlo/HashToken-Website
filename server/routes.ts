@@ -19,20 +19,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const expectedAttempts = calculateExpectedAttempts(state.maxValue);
       const difficulty = calculateDifficulty(state.maxValue);
       
-      // Get total mint count from database (single source of truth)
+      // Get total mint count from memory storage (single source of truth)
       const mintEvents = await storage.getRecentMintEvents(9999);
       const totalMints = mintEvents.length;
       
       console.log(`Total mints from database: ${totalMints}`);
       
-      // Store in database
-      await storage.updateContractState({
-        blockNumber: state.blockNumber,
-        maxValue: state.maxValue,
-        prevHash: state.prevHash,
-        totalSupply: totalMints.toString(),
-      });
-      
+      // Return calculated values directly (no storage needed)
       res.json({
         ...state,
         expectedAttempts,
