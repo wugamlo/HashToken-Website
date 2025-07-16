@@ -181,6 +181,9 @@ Changelog:
 - July 16, 2025. NEW CSV ANALYSIS: Latest CSV export (4) contains only 2,726 transactions, missing 19 historical transactions
 - July 16, 2025. Etherscan limitation confirmed: Different exports contain different subsets of historical data
 - July 16, 2025. Database contains most complete dataset: 2,745 total mint events (2,726 from CSV + 19 from blockchain sync)
+- July 16, 2025. CRITICAL FIX: Identified 19 "mint" transactions were actually Uniswap swaps incorrectly imported by blockchain sync
+- July 16, 2025. Removed 19 incorrect transactions from dataset and fixed blockchain sync validation
+- July 16, 2025. FINAL ACCURATE COUNT: 2,726 HTK tokens total supply (matches user's filtered CSV export perfectly)
 ```
 
 ## User Preferences
