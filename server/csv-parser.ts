@@ -37,10 +37,11 @@ export function loadHistoricalTransactionHashes(): Set<string> {
       if (fields.length >= 16) {
         const transactionHash = fields[0].replace(/"/g, ''); // Remove quotes
         const status = fields[13].replace(/"/g, ''); // Status field (index 13)
+        const errCode = fields[14].replace(/"/g, ''); // ErrCode field (index 14)
         const method = fields[15].replace(/"/g, ''); // Method field (index 15)
         
-        // Only count successful mint transactions (Status = blank, Method = Mint)
-        if (method === 'Mint' && status === '') {
+        // Only count successful mint transactions (Status = blank, ErrCode = blank, Method = Mint)
+        if (method === 'Mint' && status === '' && errCode === '') {
           transactionHashes.add(transactionHash.toLowerCase());
         }
       }
