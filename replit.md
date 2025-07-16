@@ -172,6 +172,9 @@ Changelog:
 - July 16, 2025. ARCHITECTURE CLEANUP: Removed redundant contract state storage table for cleaner, leaner application
 - July 16, 2025. Contract data now calculated live from Ethereum blockchain instead of storing random snapshots
 - July 16, 2025. Streamlined data model to single source of truth: mint events only
+- July 16, 2025. DATA ACCURACY FIX: Updated to latest CSV export showing exactly 2,723 valid mints (down from 2,762)
+- July 16, 2025. Corrected mint count discrepancy by filtering only successful transactions (empty status and error codes)
+- July 16, 2025. App now matches user's filtered CSV export perfectly: 2,723 HTK tokens total supply
 ```
 
 ## User Preferences

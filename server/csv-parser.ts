@@ -21,7 +21,7 @@ export function loadHistoricalTransactionHashes(): Set<string> {
   
   try {
     // Load the CSV file and extract transaction hashes for successful mints
-    const csvPath = join(process.cwd(), 'attached_assets', 'export-0xe5544a2a5fa9b175da60d8eec67add5582bb31b0 (2)_1752124024243.csv');
+    const csvPath = join(process.cwd(), 'attached_assets', 'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv');
     const csvContent = readFileSync(csvPath, 'utf-8');
     const lines = csvContent.split('\n');
     
@@ -70,7 +70,7 @@ export function isHistoricalTransaction(transactionHash: string): boolean {
 
 export async function migrateHistoricalTransactions(): Promise<number> {
   try {
-    const csvPath = join(process.cwd(), 'attached_assets', 'export-0xe5544a2a5fa9b175da60d8eec67add5582bb31b0 (2)_1752124024243.csv');
+    const csvPath = join(process.cwd(), 'attached_assets', 'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv');
     const csvContent = readFileSync(csvPath, 'utf-8');
     const lines = csvContent.split('\n');
     
