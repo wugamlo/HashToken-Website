@@ -175,6 +175,9 @@ Changelog:
 - July 16, 2025. DATA ACCURACY FIX: Updated to latest CSV export showing exactly 2,723 valid mints (down from 2,762)
 - July 16, 2025. Corrected mint count discrepancy by filtering only successful transactions (empty status and error codes)
 - July 16, 2025. App now matches user's filtered CSV export perfectly: 2,723 HTK tokens total supply
+- July 16, 2025. OVERLAP ANALYSIS: Verified correction CSV file contains 100% duplicate transactions from main file
+- July 16, 2025. Etherscan export limitation confirmed: Multiple exports contain overlapping data, not missing transactions
+- July 16, 2025. Final confirmation: 2,723 HTK tokens is the accurate total supply from complete transaction history
 ```
 
 ## User Preferences

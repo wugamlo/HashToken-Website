@@ -20,37 +20,48 @@ export function loadHistoricalTransactionHashes(): Set<string> {
   }
   
   try {
-    // Load the CSV file and extract transaction hashes for successful mints
-    const csvPath = join(process.cwd(), 'attached_assets', 'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv');
-    const csvContent = readFileSync(csvPath, 'utf-8');
-    const lines = csvContent.split('\n');
-    
     const transactionHashes = new Set<string>();
     
-    // Skip header line, process each transaction
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+    // Load the main CSV file (correction file has 100% overlap with main file)
+    const csvFiles = [
+      'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv'
+    ];
+    
+    let totalProcessed = 0;
+    
+    for (const csvFile of csvFiles) {
+      const csvPath = join(process.cwd(), 'attached_assets', csvFile);
+      const csvContent = readFileSync(csvPath, 'utf-8');
+      const lines = csvContent.split('\n');
       
-      // Parse CSV line - simple split by comma (fields are quoted)
-      const fields = line.split(',');
-      if (fields.length >= 16) {
-        const transactionHash = fields[0].replace(/"/g, ''); // Remove quotes
-        const status = fields[13].replace(/"/g, ''); // Status field (index 13)
-        const errCode = fields[14].replace(/"/g, ''); // ErrCode field (index 14)
-        const method = fields[15].replace(/"/g, ''); // Method field (index 15)
+      // Skip header line, process each transaction
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
         
-        // Only count successful mint transactions (Status = blank, ErrCode = blank, Method = Mint)
-        if (method === 'Mint' && status === '' && errCode === '') {
-          transactionHashes.add(transactionHash.toLowerCase());
+        // Parse CSV line - handle both quoted and unquoted formats
+        const fields = line.split(',');
+        if (fields.length >= 16) {
+          const transactionHash = fields[0].replace(/"/g, ''); // Remove quotes if present
+          const status = fields[13].replace(/"/g, ''); // Status field (index 13)
+          const errCode = fields[14].replace(/"/g, ''); // ErrCode field (index 14)
+          const method = fields[15].replace(/"/g, ''); // Method field (index 15)
+          
+          // Only count successful mint transactions (Status = blank, ErrCode = blank, Method = Mint)
+          if (method === 'Mint' && status === '' && errCode === '') {
+            transactionHashes.add(transactionHash.toLowerCase());
+          }
         }
       }
+      
+      totalProcessed += lines.length - 1;
+      console.log(`Processed ${lines.length - 1} lines from ${csvFile}`);
     }
     
-    console.log(`Processed ${lines.length - 1} lines from CSV, found ${transactionHashes.size} successful mint transactions`);
+    console.log(`Total processed ${totalProcessed} lines from ${csvFiles.length} CSV files, found ${transactionHashes.size} successful mint transactions`);
     
     historicalTransactionHashes = transactionHashes;
-    console.log(`Loaded ${transactionHashes.size} historical transaction hashes from CSV`);
+    console.log(`Loaded ${transactionHashes.size} historical transaction hashes from CSV files`);
     return transactionHashes;
   } catch (error) {
     console.error("Error loading historical transaction hashes:", error);
@@ -71,47 +82,56 @@ export function isHistoricalTransaction(transactionHash: string): boolean {
 
 export async function migrateHistoricalTransactions(): Promise<number> {
   try {
-    const csvPath = join(process.cwd(), 'attached_assets', 'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv');
-    const csvContent = readFileSync(csvPath, 'utf-8');
-    const lines = csvContent.split('\n');
-    
     let migratedCount = 0;
     
-    // Skip header line, process each transaction
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+    // Process the main CSV file (correction file has 100% overlap with main file)
+    const csvFiles = [
+      'export-0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0 (3)_1752637289868.csv'
+    ];
+    
+    for (const csvFile of csvFiles) {
+      const csvPath = join(process.cwd(), 'attached_assets', csvFile);
+      const csvContent = readFileSync(csvPath, 'utf-8');
+      const lines = csvContent.split('\n');
       
-      // Parse CSV line - simple split by comma (fields are quoted)
-      const fields = line.split(',');
-      if (fields.length >= 16) {
-        const transactionHash = fields[0].replace(/"/g, ''); // Remove quotes
-        const blockNumber = parseInt(fields[1].replace(/"/g, ''));
-        const timestamp = parseInt(fields[2].replace(/"/g, ''));
-        const from = fields[4].replace(/"/g, '');
-        const status = fields[13].replace(/"/g, ''); // Status field (index 13)
-        const method = fields[15].replace(/"/g, ''); // Method field (index 15)
+      // Skip header line, process each transaction
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
         
-        // Only migrate successful mint transactions (Status = blank, Method = Mint)
-        if (method === 'Mint' && status === '') {
-          // Check if transaction already exists in database
-          const existing = await storage.getMintEventByHash(transactionHash);
-          if (!existing) {
-            // Insert the historical transaction
-            await storage.insertMintEvent({
-              blockNumber,
-              transactionHash,
-              minter: from,
-              timestamp: new Date(timestamp * 1000),
-              gasUsed: '',
-              gasPrice: '',
-              difficulty: '',
-              expectedAttempts: '',
-            });
-            migratedCount++;
+        // Parse CSV line - handle both quoted and unquoted formats
+        const fields = line.split(',');
+        if (fields.length >= 16) {
+          const transactionHash = fields[0].replace(/"/g, ''); // Remove quotes if present
+          const blockNumber = parseInt(fields[1].replace(/"/g, ''));
+          const timestamp = parseInt(fields[2].replace(/"/g, ''));
+          const from = fields[4].replace(/"/g, '');
+          const status = fields[13].replace(/"/g, ''); // Status field (index 13)
+          const method = fields[15].replace(/"/g, ''); // Method field (index 15)
+          
+          // Only migrate successful mint transactions (Status = blank, Method = Mint)
+          if (method === 'Mint' && status === '') {
+            // Check if transaction already exists in database
+            const existing = await storage.getMintEventByHash(transactionHash);
+            if (!existing) {
+              // Insert the historical transaction
+              await storage.insertMintEvent({
+                blockNumber,
+                transactionHash,
+                minter: from,
+                timestamp: new Date(timestamp * 1000),
+                gasUsed: '',
+                gasPrice: '',
+                difficulty: '',
+                expectedAttempts: '',
+              });
+              migratedCount++;
+            }
           }
         }
       }
+      
+      console.log(`Processed ${csvFile} for migration`);
     }
     
     console.log(`Successfully migrated ${migratedCount} historical transactions to database`);
