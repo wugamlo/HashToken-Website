@@ -29986,10 +29986,54 @@
       "gasPrice": "20000000000",
       "difficulty": "100.0000",
       "expectedAttempts": "717000"
+    },
+    {
+      "id": 2727,
+      "blockNumber": 22930757,
+      "transactionHash": "0x228f4fa6ced9926524eabb3e9948eb151a36382548fc89ef8f4a09ae860c8a4f",
+      "minter": "0x0a7DA29599a326568C88EF1Ff2fB2F42262090FD",
+      "timestamp": "2025-07-16T09:08:47.000Z",
+      "gasUsed": "38421",
+      "gasPrice": "7384995337",
+      "difficulty": "92.7260",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 2728,
+      "blockNumber": 22930017,
+      "transactionHash": "0xab584e26ec973b40e05edea3b11e3a8b3c0686fde868a11b2e40ab895929bc9e",
+      "minter": "0x0a7DA29599a326568C88EF1Ff2fB2F42262090FD",
+      "timestamp": "2025-07-16T06:40:23.000Z",
+      "gasUsed": "38397",
+      "gasPrice": "960379323",
+      "difficulty": "92.7270",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 2729,
+      "blockNumber": 22929897,
+      "transactionHash": "0x8d15df8d17ad067ea09aa179ec5c48a057bd68aaba371a7141c29a2aa750ec4d",
+      "minter": "0x0a7DA29599a326568C88EF1Ff2fB2F42262090FD",
+      "timestamp": "2025-07-16T06:16:23.000Z",
+      "gasUsed": "38397",
+      "gasPrice": "781415010",
+      "difficulty": "92.7280",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 2730,
+      "blockNumber": 22929520,
+      "transactionHash": "0x9123e3ac9fda38fdb738c413a5528126d1d9cf94ae5356272a5a78908e551bcb",
+      "minter": "0x0a7DA29599a326568C88EF1Ff2fB2F42262090FD",
+      "timestamp": "2025-07-16T05:00:35.000Z",
+      "gasUsed": "38397",
+      "gasPrice": "766975095",
+      "difficulty": "92.7290",
+      "expectedAttempts": "1.157920892373162e+72"
     }
   ],
   "nextIds": {
     "users": 1,
-    "mintEvents": 2727
+    "mintEvents": 2731
   }
 }

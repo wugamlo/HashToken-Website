@@ -101,11 +101,7 @@ export async function getRecentMintEvents(fromBlock: number = -50000) {
         const receipt = await provider.getTransactionReceipt(event.transactionHash);
         
         // Validate this is actually a mint transaction to HashToken contract
-        const isValidMint = tx?.to?.toLowerCase() === '0xe5544a2a5fa9b175da60d8eec67add5582bb31b0' &&
-                           receipt?.logs.some(log => 
-                             log.address.toLowerCase() === '0xe5544a2a5fa9b175da60d8eec67add5582bb31b0' &&
-                             log.topics[0] === '0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885'
-                           );
+        const isValidMint = tx?.to?.toLowerCase() === '0xe5544a2a5fa9b175da60d8eec67add5582bb31b0';
         
         if (!isValidMint) {
           console.log(`Skipping invalid mint transaction: ${event.transactionHash}`);
