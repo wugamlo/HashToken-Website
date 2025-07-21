@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty } from "./ethereum";
+import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty, calculateForecast } from "./ethereum";
 import { migrateHistoricalTransactions } from "./csv-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -235,6 +235,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in auto-sync:", error);
       res.status(500).json({ error: "Failed to auto-sync mint events" });
+    }
+  });
+
+  // Get difficulty forecast for future tokens
+  app.get("/api/contract/forecast", async (req, res) => {
+    try {
+      const state = await getCurrentContractState();
+      const mintEvents = await storage.getRecentMintEvents(9999);
+      const currentMintCount = mintEvents.length;
+      
+      // Forecast for next 10, 20, and 50 tokens
+      const forecastCounts = [10, 20, 50];
+      const forecasts = calculateForecast(state.maxValue, currentMintCount, forecastCounts);
+      
+      res.json({
+        currentMintCount,
+        currentMaxValue: state.maxValue,
+        currentExpectedAttempts: calculateExpectedAttempts(state.maxValue),
+        currentDifficulty: calculateDifficulty(state.maxValue),
+        forecasts
+      });
+    } catch (error) {
+      console.error("Error calculating forecast:", error);
+      res.status(500).json({ error: "Failed to calculate forecast" });
     }
   });
 

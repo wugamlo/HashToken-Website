@@ -73,6 +73,22 @@ export default function HashTokenInfo() {
     queryFn: () => fetch('/api/contract/price').then(res => res.json()),
   });
 
+  const { data: forecastData, refetch: refetchForecast } = useQuery<{
+    currentMintCount: number;
+    currentMaxValue: string;
+    currentExpectedAttempts: string;
+    currentDifficulty: string;
+    forecasts: Array<{
+      tokenNumber: number;
+      expectedAttempts: string;
+      difficulty: string;
+      maxValue: string;
+    }>;
+  }>({
+    queryKey: ['/api/contract/forecast'],
+    queryFn: () => fetch('/api/contract/forecast').then(res => res.json()),
+  });
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -86,6 +102,7 @@ export default function HashTokenInfo() {
         queryClient.invalidateQueries({ queryKey: ['/api/contract/history'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/contract/miners'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/contract/price'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/contract/forecast'] }),
       ]);
       
       // Also explicitly refetch to ensure immediate updates
@@ -94,6 +111,7 @@ export default function HashTokenInfo() {
         refetchMintEvents(),
         refetchHistory(),
         refetchPrice(),
+        refetchForecast(),
       ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -630,6 +648,54 @@ export default function HashTokenInfo() {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground">No mining events found</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Difficulty Forecast */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Difficulty Forecast</CardTitle>
+              <CardDescription>Expected attempts for future token numbers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {forecastData ? (
+                <div className="space-y-4">
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-sm text-muted-foreground">Current Token #{forecastData.currentMintCount}</div>
+                    <div className="text-lg font-bold text-blue-500">
+                      {formatExpectedAttempts(forecastData.currentExpectedAttempts)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Expected attempts</div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {forecastData.forecasts.map((forecast, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">Token #{forecast.tokenNumber}</span>
+                          <span className="text-xs text-muted-foreground">
+                            +{forecast.tokenNumber - forecastData.currentMintCount} from current
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-orange-500">
+                            {formatExpectedAttempts(forecast.expectedAttempts)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">expected attempts</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground text-center mt-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                    💡 Each mint increases difficulty by ~1%, requiring exponentially more computational work
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-32">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
               )}
             </CardContent>

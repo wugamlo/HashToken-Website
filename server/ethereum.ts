@@ -170,3 +170,47 @@ export function calculateDifficulty(maxValue: string): string {
     return "0";
   }
 }
+
+// Calculate forecasted expected attempts for future tokens
+export function calculateForecast(currentMaxValue: string, currentMintCount: number, forecastCounts: number[]): Array<{
+  tokenNumber: number;
+  expectedAttempts: string;
+  difficulty: string;
+  maxValue: string;
+}> {
+  try {
+    const currentMaxValueBigInt = BigInt(currentMaxValue);
+    
+    // HashToken difficulty progression: each mint reduces max_value by approximately 1%
+    // Based on the contract logic: new_max_value = prev_max_value * 99 / 100
+    const difficultyFactor = BigInt(99);
+    const difficultyDivisor = BigInt(100);
+    
+    const forecasts = [];
+    
+    for (const futureCount of forecastCounts) {
+      const mintsAhead = futureCount;
+      
+      // Calculate future max_value after 'mintsAhead' more mints
+      let futureMaxValue = currentMaxValueBigInt;
+      for (let i = 0; i < mintsAhead; i++) {
+        futureMaxValue = (futureMaxValue * difficultyFactor) / difficultyDivisor;
+      }
+      
+      const futureExpectedAttempts = calculateExpectedAttempts(futureMaxValue.toString());
+      const futureDifficulty = calculateDifficulty(futureMaxValue.toString());
+      
+      forecasts.push({
+        tokenNumber: currentMintCount + mintsAhead,
+        expectedAttempts: futureExpectedAttempts,
+        difficulty: futureDifficulty,
+        maxValue: futureMaxValue.toString()
+      });
+    }
+    
+    return forecasts;
+  } catch (error) {
+    console.error("Error calculating forecast:", error);
+    return [];
+  }
+}
