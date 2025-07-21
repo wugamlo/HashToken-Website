@@ -604,6 +604,54 @@ export default function HashTokenInfo() {
         </TabsContent>
 
         <TabsContent value="mining" className="space-y-6">
+          {/* Difficulty Forecast - Moved to top */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Difficulty Forecast</CardTitle>
+              <CardDescription>Expected attempts for future token numbers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {forecastData ? (
+                <div className="space-y-4">
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-sm text-muted-foreground">Current Token #{forecastData.currentMintCount}</div>
+                    <div className="text-lg font-bold text-blue-500">
+                      {formatExpectedAttempts(forecastData.currentExpectedAttempts)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Expected attempts</div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {forecastData.forecasts.map((forecast, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">Token #{forecast.tokenNumber}</span>
+                          <span className="text-xs text-muted-foreground">
+                            +{forecast.tokenNumber - forecastData.currentMintCount} from current
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-orange-500">
+                            {formatExpectedAttempts(forecast.expectedAttempts)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">expected attempts</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground text-center mt-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                    💡 Each mint increases difficulty by ~1%, requiring exponentially more computational work
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-32">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Mining History</CardTitle>
@@ -653,53 +701,7 @@ export default function HashTokenInfo() {
             </CardContent>
           </Card>
 
-          {/* Difficulty Forecast */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Difficulty Forecast</CardTitle>
-              <CardDescription>Expected attempts for future token numbers</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {forecastData ? (
-                <div className="space-y-4">
-                  <div className="text-center p-3 bg-muted rounded-lg">
-                    <div className="text-sm text-muted-foreground">Current Token #{forecastData.currentMintCount}</div>
-                    <div className="text-lg font-bold text-blue-500">
-                      {formatExpectedAttempts(forecastData.currentExpectedAttempts)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Expected attempts</div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {forecastData.forecasts.map((forecast, index) => (
-                      <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium">Token #{forecast.tokenNumber}</span>
-                          <span className="text-xs text-muted-foreground">
-                            +{forecast.tokenNumber - forecastData.currentMintCount} from current
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-orange-500">
-                            {formatExpectedAttempts(forecast.expectedAttempts)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">expected attempts</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="text-xs text-muted-foreground text-center mt-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                    💡 Each mint increases difficulty by ~1%, requiring exponentially more computational work
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
@@ -789,12 +791,18 @@ export default function HashTokenInfo() {
                     <div className="text-sm text-muted-foreground">Total Mints</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">1,595</div>
-                    <div className="text-sm text-muted-foreground">Peak Day</div>
+                    <div className="text-2xl font-bold text-orange-600">
+                      {mintEvents && mintEvents.length > 0 ? 
+                        new Date(mintEvents[0].timestamp).toLocaleDateString() : 'N/A'
+                      }
+                    </div>
+                    <div className="text-sm text-muted-foreground">Latest Mint</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">3 days</div>
-                    <div className="text-sm text-muted-foreground">Active Period</div>
+                    <div className="text-2xl font-bold text-purple-600">
+                      {contractState ? formatExpectedAttempts(contractState.expectedAttempts) : 'N/A'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Current Difficulty</div>
                   </div>
                 </div>
 
@@ -812,8 +820,8 @@ export default function HashTokenInfo() {
                 <Alert>
                   <Activity className="h-4 w-4" />
                   <AlertDescription>
-                    Mining activity peaked on July 8, 2025, with 1,595 successful mints in a single day. 
-                    Most mining activity occurred during July 7-9, 2025, showing renewed interest in this historic token.
+                    HashToken mining continues with {contractState?.totalMints?.toLocaleString() || 'N/A'} total tokens minted since 2016. 
+                    Each successful mint increases difficulty by 1%, making mining progressively more challenging over time.
                   </AlertDescription>
                 </Alert>
 
