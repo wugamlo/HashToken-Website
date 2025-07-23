@@ -384,8 +384,9 @@ export default function HashTokenInfo() {
           <h2 className="text-2xl font-semibold">Historic Significance</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
             HashToken was deployed on <strong>June 17, 2016</strong>, making it the first Ethereum token to implement 
-            proof-of-work mining logic. This pioneering contract introduced the concept of mining 
-            tokens directly on the Ethereum network, predating many modern mining token implementations.
+            a self-limiting proof-of-work model. This groundbreaking contract introduced the revolutionary concept of 
+            exponentially increasing mining difficulty, where each successful mint makes subsequent tokens progressively 
+            harder to mine, creating natural scarcity through computational work.
           </p>
         </div>
 
@@ -393,10 +394,10 @@ export default function HashTokenInfo() {
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">How It Works</h3>
             <div className="space-y-2 text-muted-foreground">
-              <p>• <strong>Proof-of-Work Mining:</strong> Miners must find a hash value that meets the current difficulty target</p>
-              <p>• <strong>Dynamic Difficulty:</strong> The max_value decreases by 1% after each successful mint</p>
+              <p>• <strong>Self-Limiting PoW:</strong> First token to implement exponentially increasing mining difficulty</p>
+              <p>• <strong>Dynamic Scarcity:</strong> Each mint reduces max_value by 1%, creating natural token scarcity</p>
               <p>• <strong>Keccak-256 Hash:</strong> Uses the same hashing algorithm as Ethereum</p>
-              <p>• <strong>Progressive Difficulty:</strong> Each mint makes the next one approximately 1% harder</p>
+              <p>• <strong>Exponential Progression:</strong> Mining difficulty compounds by ~1% with each successful mint</p>
             </div>
           </div>
 
@@ -761,7 +762,7 @@ export default function HashTokenInfo() {
                   <div className="p-3 bg-muted rounded-lg">
                     <h4 className="font-medium mb-2">Historical Context</h4>
                     <p className="text-sm text-muted-foreground">
-                      Created in 2016, HashToken was the first token to implement mining on Ethereum, predating most modern mining tokens.
+                      Created in 2016, HashToken pioneered the self-limiting PoW model on Ethereum, introducing exponential difficulty scaling that creates natural token scarcity.
                     </p>
                   </div>
                 </div>

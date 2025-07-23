@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive full-stack TypeScript web application that provides detailed information about HashToken (HTK), the first Ethereum token with proof-of-work minting logic. The application features live contract data, mining history, analytics, and an educational interface about this historic 2016 token. It includes both an information website and the original hash calculator for educational purposes.
+This is a comprehensive full-stack TypeScript web application that provides detailed information about HashToken (HTK), the first Ethereum token with a self-limiting proof-of-work model. The application features live contract data, mining history, analytics, and an educational interface about this pioneering 2016 token that introduced exponential difficulty scaling. It includes both an information website and the original hash calculator for educational purposes.
 
 ## System Architecture
 
@@ -190,6 +190,9 @@ Changelog:
 - July 21, 2025. DIFFICULTY FORECAST FEATURE: Added forecast system to predict expected attempts for future tokens (next 10, 20, 50)
 - July 21, 2025. Implemented forecast API endpoint and analytics dashboard showing exponential difficulty progression
 - July 21, 2025. Enhanced Analytics tab with difficulty forecast visualization showing mining computational requirements
+- July 23, 2025. UPDATED POSITIONING: Revised HashToken definition to emphasize it as first token with self-limiting PoW model (not first PoW token overall)
+- July 23, 2025. Enhanced messaging to highlight pioneering exponential difficulty scaling and natural scarcity creation through computational work
+- July 23, 2025. Moved difficulty forecast section above Mining History for better visibility as requested
 ```
 
 ## User Preferences
