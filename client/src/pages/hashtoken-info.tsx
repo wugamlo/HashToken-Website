@@ -218,7 +218,7 @@ export default function HashTokenInfo() {
             />
             <div>
               <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
-              <p className="text-lg text-muted-foreground mt-1">The First Ethereum Mining Token</p>
+              <p className="text-lg text-muted-foreground mt-1">First Self-Limiting PoW Token</p>
             </div>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function HashTokenInfo() {
               />
               <div>
                 <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
-                <p className="text-lg text-muted-foreground mt-1">The First Ethereum Mining Token</p>
+                <p className="text-lg text-muted-foreground mt-1">First Self-Limiting PoW Token</p>
               </div>
             </div>
             
