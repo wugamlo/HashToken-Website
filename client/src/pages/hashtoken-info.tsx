@@ -40,21 +40,29 @@ export default function HashTokenInfo() {
 
   const { data: contractState, isLoading: stateLoading, refetch: refetchState } = useQuery<ContractState>({
     queryKey: ['/api/contract/state'],
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    staleTime: 60 * 1000, // Consider data stale after 1 minute
   });
 
   const { data: mintEvents, isLoading: eventsLoading, refetch: refetchMintEvents } = useQuery<MintEvent[]>({
     queryKey: ['/api/contract/mint-events'],
     queryFn: () => fetch('/api/contract/mint-events?limit=50').then(res => res.json()),
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    staleTime: 60 * 1000, // Consider data stale after 1 minute
   });
 
   const { data: historyEvents, refetch: refetchHistory } = useQuery<MintEvent[]>({
     queryKey: ['/api/contract/history'],
     queryFn: () => fetch('/api/contract/history?days=30').then(res => res.json()),
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (less frequent)
+    staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
   });
 
   const { data: miners, refetch: refetchMiners } = useQuery<Array<{address: string, count: number}>>({
     queryKey: ['/api/contract/miners'],
     queryFn: () => fetch('/api/contract/miners').then(res => res.json()),
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
   });
 
   const { data: priceData, refetch: refetchPrice } = useQuery<{
@@ -71,6 +79,8 @@ export default function HashTokenInfo() {
   }>({
     queryKey: ['/api/contract/price'],
     queryFn: () => fetch('/api/contract/price').then(res => res.json()),
+    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
+    staleTime: 90 * 1000, // Consider data stale after 90 seconds
   });
 
   const { data: forecastData, refetch: refetchForecast } = useQuery<{
@@ -87,6 +97,8 @@ export default function HashTokenInfo() {
   }>({
     queryKey: ['/api/contract/forecast'],
     queryFn: () => fetch('/api/contract/forecast').then(res => res.json()),
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    staleTime: 60 * 1000, // Consider data stale after 1 minute
   });
 
   const handleRefresh = async () => {

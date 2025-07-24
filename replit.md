@@ -193,6 +193,9 @@ Changelog:
 - July 23, 2025. UPDATED POSITIONING: Revised HashToken definition to emphasize it as first token with self-limiting PoW model (not first PoW token overall)
 - July 23, 2025. Enhanced messaging to highlight pioneering exponential difficulty scaling and natural scarcity creation through computational work
 - July 23, 2025. Moved difficulty forecast section above Mining History for better visibility as requested
+- July 24, 2025. AUTOMATIC REFRESH IMPLEMENTATION: Added automatic periodic refreshing to frontend queries to keep data current
+- July 24, 2025. Contract state and mint events now auto-refresh every 2 minutes, price data every 3 minutes, history data every 5 minutes
+- July 24, 2025. Fixed supply count fluctuation issue - users now see updated token counts without manual refresh
 ```
 
 ## User Preferences
