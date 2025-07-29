@@ -40,15 +40,19 @@ export default function HashTokenInfo() {
 
   const { data: contractState, isLoading: stateLoading, refetch: refetchState } = useQuery<ContractState>({
     queryKey: ['/api/contract/state'],
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
-    staleTime: 60 * 1000, // Consider data stale after 1 minute
+    refetchInterval: 1 * 60 * 1000, // Refetch every 1 minute (more frequent for supply updates)
+    staleTime: 30 * 1000, // Consider data stale after 30 seconds
+    refetchOnWindowFocus: true, // Refresh when user focuses the page
+    refetchOnMount: true, // Always fetch fresh data on component mount
   });
 
   const { data: mintEvents, isLoading: eventsLoading, refetch: refetchMintEvents } = useQuery<MintEvent[]>({
     queryKey: ['/api/contract/mint-events'],
     queryFn: () => fetch('/api/contract/mint-events?limit=50').then(res => res.json()),
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
-    staleTime: 60 * 1000, // Consider data stale after 1 minute
+    refetchInterval: 1 * 60 * 1000, // Refetch every 1 minute
+    staleTime: 30 * 1000, // Consider data stale after 30 seconds
+    refetchOnWindowFocus: true, // Refresh when user focuses the page
+    refetchOnMount: true, // Always fetch fresh data on component mount
   });
 
   const { data: historyEvents, refetch: refetchHistory } = useQuery<MintEvent[]>({
@@ -97,8 +101,10 @@ export default function HashTokenInfo() {
   }>({
     queryKey: ['/api/contract/forecast'],
     queryFn: () => fetch('/api/contract/forecast').then(res => res.json()),
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
-    staleTime: 60 * 1000, // Consider data stale after 1 minute
+    refetchInterval: 1 * 60 * 1000, // Refetch every 1 minute
+    staleTime: 30 * 1000, // Consider data stale after 30 seconds
+    refetchOnWindowFocus: true, // Refresh when user focuses the page
+    refetchOnMount: true, // Always fetch fresh data on component mount
   });
 
   const handleRefresh = async () => {
