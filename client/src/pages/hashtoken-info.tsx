@@ -539,6 +539,20 @@ export default function HashTokenInfo() {
                   </div>
                   <ExternalLink className="h-3 w-3" />
                 </a>
+                <a 
+                  href="https://dexscreener.com/ethereum/0x01c0aeaee4f9b9417237aef3556bc1d7bd00ec52"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2 bg-muted rounded hover:bg-muted/80 transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">S</span>
+                    </div>
+                    <span className="text-sm">DexScreener</span>
+                  </div>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
               </div>
             </div>
 
