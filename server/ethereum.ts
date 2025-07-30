@@ -130,6 +130,26 @@ export async function getRecentMintEvents(fromBlock: number = -50000) {
   }
 }
 
+export function calculateSupplyFromMaxValue(maxValue: string): number {
+  try {
+    const currentMaxValue = BigInt(maxValue);
+    const initialMaxValue = BigInt(2) ** BigInt(255); // 2^255 from contract
+    
+    // Each mint reduces max_value by 1% (multiplies by 0.99)
+    // So: current_max_value = initial_max_value * (0.99)^supply
+    // Therefore: supply = log(current_max_value / initial_max_value) / log(0.99)
+    
+    // Use floating point for logarithm calculation
+    const ratio = Number(currentMaxValue) / Number(initialMaxValue);
+    const supply = Math.log(ratio) / Math.log(0.99);
+    
+    return Math.round(supply);
+  } catch (error) {
+    console.error("Error calculating supply from max_value:", error);
+    return 0;
+  }
+}
+
 export function calculateExpectedAttempts(maxValue: string): string {
   try {
     const maxValueBigInt = BigInt(maxValue);

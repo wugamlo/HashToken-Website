@@ -35332,10 +35332,32 @@
       "gasPrice": "8287367346",
       "difficulty": "93.2110",
       "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3213,
+      "blockNumber": 23033448,
+      "transactionHash": "0xcea02a9ab06817bc2d5b65fa880b6298a9d481d249199458216dfeb4e92ee390",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-07-30T17:31:47.000Z",
+      "gasUsed": "38481",
+      "gasPrice": "2182830872",
+      "difficulty": "93.2120",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3214,
+      "blockNumber": 23032569,
+      "transactionHash": "0x253e2b40a93f711ed4d68113f2d45be4f9f876c2047c1c362830d4f863b570a1",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-07-30T14:34:35.000Z",
+      "gasUsed": "38493",
+      "gasPrice": "2927206886",
+      "difficulty": "93.2130",
+      "expectedAttempts": "1.157920892373162e+72"
     }
   ],
   "nextIds": {
     "users": 1,
-    "mintEvents": 3213
+    "mintEvents": 3215
   }
 }

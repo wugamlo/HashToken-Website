@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty, calculateForecast } from "./ethereum";
+import { initializeProvider, getCurrentContractState, getRecentMintEvents, calculateExpectedAttempts, calculateDifficulty, calculateForecast, calculateSupplyFromMaxValue } from "./ethereum";
 import { migrateHistoricalTransactions } from "./csv-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -19,19 +19,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const expectedAttempts = calculateExpectedAttempts(state.maxValue);
       const difficulty = calculateDifficulty(state.maxValue);
       
-      // Get total mint count from memory storage (single source of truth)
+      // Calculate supply from max_value (authoritative blockchain state)
+      const supplyFromMaxValue = calculateSupplyFromMaxValue(state.maxValue);
+      
+      // Get transaction count from memory storage (for analytics)
       const mintEvents = await storage.getRecentMintEvents(9999);
-      const totalMints = mintEvents.length;
+      const transactionCount = mintEvents.length;
       
-      console.log(`Total mints from database: ${totalMints}`);
+      console.log(`Supply from max_value: ${supplyFromMaxValue}, Transaction count: ${transactionCount}`);
       
-      // Return calculated values directly (no storage needed)
+      // Use max_value-based supply as the authoritative source
       res.json({
         ...state,
         expectedAttempts,
         difficulty,
-        totalMints: totalMints,
-        totalSupply: totalMints.toString(), // Each mint = 1 HTK
+        totalMints: supplyFromMaxValue, // Authoritative supply from blockchain state
+        totalSupply: supplyFromMaxValue.toString(), // Main supply display
+        transactionCount: transactionCount, // Available for analytics
       });
     } catch (error) {
       console.error("Error fetching contract state:", error);
@@ -41,10 +45,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         blockNumber: 21425000, // Approximate current block
         maxValue: "460766", // Approximate current max_value based on historical data
         prevHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-        totalSupply: "200000000000000000000000", // 200,000 HTK
+        totalSupply: "3214", // Current estimated supply
         expectedAttempts: "2.47e14", // 247 trillion attempts
         difficulty: "99.99", // Very high difficulty
-        totalMints: 200000, // Approximate total mints
+        totalMints: 3214, // Current estimated supply
+        transactionCount: 3214, // Same as mints for fallback
         isOffline: true, // Indicate data is not live
       };
       
@@ -242,8 +247,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/contract/forecast", async (req, res) => {
     try {
       const state = await getCurrentContractState();
-      const mintEvents = await storage.getRecentMintEvents(9999);
-      const currentMintCount = mintEvents.length;
+      
+      // Use max_value-based supply calculation (authoritative)
+      const currentMintCount = calculateSupplyFromMaxValue(state.maxValue);
       
       // Forecast for next 10, 20, and 50 tokens
       const forecastCounts = [10, 20, 50];
