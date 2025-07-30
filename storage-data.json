@@ -35321,10 +35321,21 @@
       "gasPrice": "729483078",
       "difficulty": "93.2100",
       "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3212,
+      "blockNumber": 23025320,
+      "transactionHash": "0xaa1e3e28523d8d79207bbc3e948ab2e5943e59df4d510d87263250b2231bd2fe",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-07-29T14:14:35.000Z",
+      "gasUsed": "38493",
+      "gasPrice": "8287367346",
+      "difficulty": "93.2110",
+      "expectedAttempts": "1.157920892373162e+72"
     }
   ],
   "nextIds": {
     "users": 1,
-    "mintEvents": 3212
+    "mintEvents": 3213
   }
 }
