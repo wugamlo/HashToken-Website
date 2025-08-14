@@ -35354,10 +35354,65 @@
       "gasPrice": "2927206886",
       "difficulty": "93.2130",
       "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3215,
+      "blockNumber": 23136123,
+      "transactionHash": "0xa94da636c4c9de916553e938cd47766358c1e894ed22b092de8f56dda4e89db5",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-08-14T01:50:59.000Z",
+      "gasUsed": "38481",
+      "gasPrice": "820626260",
+      "difficulty": "93.2140",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3216,
+      "blockNumber": 23109124,
+      "transactionHash": "0xbcbfde4dd616e7454e60d967e052cc80fcb51e7884b32c7a28fa6eeb01374d9b",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-08-10T07:19:35.000Z",
+      "gasUsed": "55593",
+      "gasPrice": "219418607",
+      "difficulty": "93.2150",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3217,
+      "blockNumber": 23093580,
+      "transactionHash": "0x987e4dab877b6e1aa22ca204ff0895d59ee9b8d4bb0c55f55d2378d719009a1b",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-08-08T03:12:59.000Z",
+      "gasUsed": "38493",
+      "gasPrice": "220122115",
+      "difficulty": "93.2160",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3218,
+      "blockNumber": 23092385,
+      "transactionHash": "0x8c7523f0b7a1dce99630fc03ad59dca021e5946c5fd5d69eb78a407cd1203d9a",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-08-07T23:12:59.000Z",
+      "gasUsed": "38493",
+      "gasPrice": "317229948",
+      "difficulty": "93.2170",
+      "expectedAttempts": "1.157920892373162e+72"
+    },
+    {
+      "id": 3219,
+      "blockNumber": 23088644,
+      "transactionHash": "0x2102ae40209ea5855d0aef1a3bc3ee4159a5499476e77b9361e0f57a4d79712b",
+      "minter": "0x0a374B2259096Ba47fC0d0cF8586fC10B8879F42",
+      "timestamp": "2025-08-07T10:39:23.000Z",
+      "gasUsed": "38493",
+      "gasPrice": "967678563",
+      "difficulty": "93.2180",
+      "expectedAttempts": "1.157920892373162e+72"
     }
   ],
   "nextIds": {
     "users": 1,
-    "mintEvents": 3215
+    "mintEvents": 3220
   }
 }
