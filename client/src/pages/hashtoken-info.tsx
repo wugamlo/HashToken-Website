@@ -41,9 +41,10 @@ export default function HashTokenInfo() {
   const { data: contractState, isLoading: stateLoading, refetch: refetchState } = useQuery<ContractState>({
     queryKey: ['/api/contract/state'],
     refetchInterval: 1 * 60 * 1000, // Refetch every 1 minute (more frequent for supply updates)
-    staleTime: 30 * 1000, // Consider data stale after 30 seconds
+    staleTime: 0, // Always consider data stale to force fresh fetches
     refetchOnWindowFocus: true, // Refresh when user focuses the page
     refetchOnMount: true, // Always fetch fresh data on component mount
+    gcTime: 0, // Don't cache old data
   });
 
   const { data: mintEvents, isLoading: eventsLoading, refetch: refetchMintEvents } = useQuery<MintEvent[]>({
