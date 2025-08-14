@@ -163,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sync recent mint events from blockchain
   app.post("/api/contract/sync", async (req, res) => {
     try {
-      const fromBlock = req.body.fromBlock || -50000;
+      const fromBlock = req.body.fromBlock || -10000; // Reduced to stay within limits
       const events = await getRecentMintEvents(fromBlock);
       let syncedCount = 0;
       
@@ -206,8 +206,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auto-sync endpoint for regular background sync
   app.post("/api/contract/auto-sync", async (req, res) => {
     try {
-      // Use smaller block range for regular sync
-      const events = await getRecentMintEvents(-2000);
+      // Use smaller block range for regular sync to avoid RPC limits
+      const events = await getRecentMintEvents(-5000);
       let syncedCount = 0;
       
       for (const event of events) {

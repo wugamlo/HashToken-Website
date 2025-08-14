@@ -133,7 +133,8 @@ export async function getRecentMintEvents(fromBlock: number = -50000) {
 export function calculateSupplyFromMaxValue(maxValue: string): number {
   try {
     const currentMaxValue = BigInt(maxValue);
-    const initialMaxValue = BigInt(2) ** BigInt(255); // 2^255 from contract
+    // From contract: max_value = 2 ** 255 (line 61 in contract)
+    const initialMaxValue = BigInt(2) ** BigInt(255);
     
     // Each mint reduces max_value by 1% (multiplies by 0.99)
     // So: current_max_value = initial_max_value * (0.99)^supply
@@ -177,14 +178,26 @@ export function calculateExpectedAttempts(maxValue: string): string {
 export function calculateDifficulty(maxValue: string): string {
   try {
     const maxValueBigInt = BigInt(maxValue);
-    const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+    const maxPossible = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'); // 2^256 - 1
     
     // Calculate difficulty as percentage of search space eliminated
-    // Using floating point for better precision in display
-    const ratio = Number(maxValueBigInt) / Number(maxPossible);
-    const difficulty = (1 - ratio) * 100;
+    // For very small ratios, we need better precision handling
     
-    return difficulty.toFixed(4);
+    // Check if the ratio is extremely small (close to 0)
+    if (maxValueBigInt * BigInt(1e6) < maxPossible) {
+      // For very high difficulties, calculate more precisely
+      // difficulty ≈ 100 * (1 - maxValue / 2^256)
+      
+      // Use decimal approximation: difficulty = 100 - (100 * maxValue / 2^256)
+      // Since maxValue is very small compared to 2^256, we can approximate
+      const difficulty = 100 - (Number(maxValueBigInt) / Number(maxPossible)) * 100;
+      return difficulty.toFixed(6);
+    } else {
+      // For lower difficulties, use normal calculation
+      const ratio = Number(maxValueBigInt) / Number(maxPossible);
+      const difficulty = (1 - ratio) * 100;
+      return difficulty.toFixed(4);
+    }
   } catch (error) {
     console.error("Error calculating difficulty:", error);
     return "0";

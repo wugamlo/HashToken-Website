@@ -196,6 +196,11 @@ Changelog:
 - July 24, 2025. AUTOMATIC REFRESH IMPLEMENTATION: Added automatic periodic refreshing to frontend queries to keep data current
 - July 24, 2025. Contract state and mint events now auto-refresh every 2 minutes, price data every 3 minutes, history data every 5 minutes
 - July 24, 2025. Fixed supply count fluctuation issue - users now see updated token counts without manual refresh
+- August 14, 2025. SUPPLY CALCULATION PIVOT: Implemented max_value-based supply calculation as authoritative source per community consensus
+- August 14, 2025. Enhanced difficulty calculation precision for very high difficulty values (>99.99%)
+- August 14, 2025. Fixed RPC provider block range limits (reduced from 50K to 10K blocks per sync)
+- August 14, 2025. Supply now shows blockchain-authoritative count (3,353) vs transaction count (3,219) revealing 134 missing transactions
+- August 14, 2025. Market cap calculation updated to use max_value-based supply for accurate valuation
 ```
 
 ## User Preferences
