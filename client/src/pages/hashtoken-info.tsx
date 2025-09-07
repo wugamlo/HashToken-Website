@@ -234,7 +234,7 @@ export default function HashTokenInfo() {
             <img 
               src={hashTokenLogo} 
               alt="HashToken Logo" 
-              className="h-16 w-16 rounded-full object-cover"
+              className="h-20 w-20 rounded-full object-cover"
             />
             <div>
               <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
@@ -250,7 +250,7 @@ export default function HashTokenInfo() {
               <img 
                 src={hashTokenLogo} 
                 alt="HashToken Logo" 
-                className="h-16 w-16 rounded-full object-cover"
+                className="h-20 w-20 rounded-full object-cover"
               />
               <div>
                 <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
@@ -309,7 +309,7 @@ export default function HashTokenInfo() {
             </CardHeader>
             <CardContent>
               <div className="text-center space-y-2">
-                <div className="text-4xl font-bold text-orange-500">
+                <div className="text-4xl font-bold text-red-500">
                   {formatExpectedAttempts(contractState.expectedAttempts)}
                 </div>
                 <div className="text-sm text-muted-foreground">For Next Mint</div>
