@@ -234,7 +234,7 @@ export default function HashTokenInfo() {
             <img 
               src={hashTokenLogo} 
               alt="HashToken Logo" 
-              className="h-16 w-16 rounded-full object-cover border-2 border-border"
+              className="h-16 w-16 rounded-full object-cover"
             />
             <div>
               <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
@@ -250,7 +250,7 @@ export default function HashTokenInfo() {
               <img 
                 src={hashTokenLogo} 
                 alt="HashToken Logo" 
-                className="h-16 w-16 rounded-full object-cover border-2 border-border"
+                className="h-16 w-16 rounded-full object-cover"
               />
               <div>
                 <h1 className="text-4xl font-bold">HashToken (HTK)</h1>
