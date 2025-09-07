@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { ExternalLink, RefreshCw, Clock, Hash, TrendingUp, Activity, Database, Zap, DollarSign } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import hashTokenLogo from "@assets/image_1757206689096.png";
 
 interface ContractState {
   blockNumber: number;
@@ -231,7 +232,7 @@ export default function HashTokenInfo() {
           
           <div className="flex items-center justify-center space-x-4">
             <img 
-              src="/hashtoken-logo.jpg" 
+              src={hashTokenLogo} 
               alt="HashToken Logo" 
               className="h-16 w-16 rounded-full object-cover border-2 border-border"
             />
@@ -247,7 +248,7 @@ export default function HashTokenInfo() {
           <div className="relative">
             <div className="flex items-center justify-center space-x-4">
               <img 
-                src="/hashtoken-logo.jpg" 
+                src={hashTokenLogo} 
                 alt="HashToken Logo" 
                 className="h-16 w-16 rounded-full object-cover border-2 border-border"
               />
