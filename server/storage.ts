@@ -14,9 +14,9 @@ export interface IStorage {
   insertMintEvents(events: InsertMintEvent[]): Promise<number>;
   getMintEventByHash(hash: string): Promise<MintEvent | undefined>;
   getMintEventCount(): Promise<number>;
-  getSyncState(): Promise<SyncState | undefined>;
-  saveSyncSuccess(lastProcessedBlock: number): Promise<SyncState>;
-  saveSyncFailure(message: string): Promise<void>;
+  getSyncState(chain?: string): Promise<SyncState | undefined>;
+  saveSyncSuccess(lastProcessedBlock: number, chain?: string): Promise<SyncState>;
+  saveSyncFailure(message: string, chain?: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -92,20 +92,20 @@ export class DatabaseStorage implements IStorage {
     return events.length;
   }
 
-  async getSyncState(): Promise<SyncState | undefined> {
+  async getSyncState(chain: string = "ethereum-mainnet"): Promise<SyncState | undefined> {
     const [state] = await db
       .select()
       .from(syncStates)
-      .where(eq(syncStates.chain, "ethereum-mainnet"));
+      .where(eq(syncStates.chain, chain));
     return state;
   }
 
-  async saveSyncSuccess(lastProcessedBlock: number): Promise<SyncState> {
+  async saveSyncSuccess(lastProcessedBlock: number, chain: string = "ethereum-mainnet"): Promise<SyncState> {
     const now = new Date();
     const [state] = await db
       .insert(syncStates)
       .values({
-        chain: "ethereum-mainnet",
+        chain,
         lastProcessedBlock,
         lastSuccessfulSyncAt: now,
         lastAttemptAt: now,
@@ -126,12 +126,12 @@ export class DatabaseStorage implements IStorage {
     return state;
   }
 
-  async saveSyncFailure(message: string): Promise<void> {
+  async saveSyncFailure(message: string, chain: string = "ethereum-mainnet"): Promise<void> {
     const now = new Date();
     await db
       .insert(syncStates)
       .values({
-        chain: "ethereum-mainnet",
+        chain,
         lastAttemptAt: now,
         lastError: message.slice(0, 1000),
         updatedAt: now,

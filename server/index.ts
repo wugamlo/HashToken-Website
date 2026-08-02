@@ -71,7 +71,7 @@ app.use((req, res, next) => {
 
     const runIndexer = async (fullBackfill = false) => {
       try {
-        const result = await syncMintHistory({ fullBackfill });
+        const result = await syncMintHistory({ fullBackfill, recentFirst: true });
         if (result.inserted > 0 || result.hasMoreHistory) {
           console.log(`Mint indexer: ${result.inserted} events stored through block ${result.processedToBlock}`);
         }

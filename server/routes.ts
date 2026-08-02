@@ -90,7 +90,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/contract/sync", async (req, res) => {
     try {
-      res.json(await syncMintHistory({ fullBackfill: Boolean(req.body?.fullBackfill) }));
+      res.json(await syncMintHistory({
+        fullBackfill: Boolean(req.body?.fullBackfill),
+        recentFirst: true,
+      }));
     } catch (error) {
       console.error("Error syncing mint events:", error);
       res.status(502).json({ error: "Failed to synchronize mints from Ethereum" });
@@ -99,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/contract/auto-sync", async (_req, res) => {
     try {
-      res.json(await syncMintHistory({ fullBackfill: true }));
+      res.json(await syncMintHistory({ fullBackfill: true, recentFirst: true }));
     } catch (error) {
       console.error("Error in automatic mint sync:", error);
       res.status(502).json({ error: "Failed to synchronize mints from Ethereum" });

@@ -39,6 +39,7 @@ interface SyncStatus {
   status: "ready" | "syncing" | "error";
   eventCount: number;
   checkpointBlock: number | null;
+  recentCheckpointBlock?: number | null;
   lastSuccessfulSyncAt: string | null;
   lastAttemptAt: string | null;
   lastError: string | null;

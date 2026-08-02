@@ -12,6 +12,9 @@ import type { InsertMintEvent } from "@shared/schema";
 const CHUNK_SIZE = 750;
 const REORG_OVERLAP_BLOCKS = 24;
 const INITIAL_BACKFILL_BLOCKS_PER_RUN = 15_000;
+const RECENT_WINDOW_BLOCKS = 15_000;
+const BACKFILL_CURSOR = "ethereum-mainnet";
+const RECENT_CURSOR = "ethereum-mainnet-recent";
 
 export type SyncResult = {
   running: boolean;
@@ -38,18 +41,26 @@ function asInsertEvent(event: ChainMintEvent): InsertMintEvent {
   };
 }
 
-async function runSync(maxBlocks: number): Promise<SyncResult> {
+async function runSync(
+  maxBlocks: number,
+  options: { recentFirst?: boolean } = {},
+): Promise<SyncResult> {
   const latestBlock = await getLatestBlockNumber();
-  const savedState = await storage.getSyncState();
+  const cursor = options.recentFirst ? RECENT_CURSOR : BACKFILL_CURSOR;
+  const savedState = await storage.getSyncState(cursor);
   const checkpoint = savedState?.lastProcessedBlock ?? 0;
-  const earliestStoredEvent = (await storage.getRecentMintEvents(10000))
-    .reduce((minimum, event) => Math.min(minimum, event.blockNumber), Number.MAX_SAFE_INTEGER);
-  const startBlock = checkpoint
-    ? Math.max(CONTRACT_DEPLOYMENT_BLOCK, checkpoint - REORG_OVERLAP_BLOCKS)
-    : Math.max(
-      CONTRACT_DEPLOYMENT_BLOCK,
-      Number.isFinite(earliestStoredEvent) ? earliestStoredEvent - REORG_OVERLAP_BLOCKS : CONTRACT_DEPLOYMENT_BLOCK,
-    );
+  const earliestStoredEvent = options.recentFirst
+    ? Number.MAX_SAFE_INTEGER
+    : (await storage.getRecentMintEvents(10000))
+      .reduce((minimum, event) => Math.min(minimum, event.blockNumber), Number.MAX_SAFE_INTEGER);
+  const startBlock = options.recentFirst
+    ? Math.max(CONTRACT_DEPLOYMENT_BLOCK, latestBlock - RECENT_WINDOW_BLOCKS)
+    : checkpoint
+      ? Math.max(CONTRACT_DEPLOYMENT_BLOCK, checkpoint - REORG_OVERLAP_BLOCKS)
+      : Math.max(
+        CONTRACT_DEPLOYMENT_BLOCK,
+        Number.isFinite(earliestStoredEvent) ? earliestStoredEvent - REORG_OVERLAP_BLOCKS : CONTRACT_DEPLOYMENT_BLOCK,
+      );
   const targetBlock = Math.min(latestBlock, startBlock + maxBlocks - 1);
 
   if (startBlock > latestBlock) {
@@ -76,7 +87,7 @@ async function runSync(maxBlocks: number): Promise<SyncResult> {
       inserted += await storage.insertMintEvents(events.map(asInsertEvent));
 
       // A checkpoint only advances after this entire range has been fetched and committed.
-      await storage.saveSyncSuccess(toBlock);
+      await storage.saveSyncSuccess(toBlock, cursor);
       chunks++;
     }
 
@@ -91,15 +102,35 @@ async function runSync(maxBlocks: number): Promise<SyncResult> {
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await storage.saveSyncFailure(message);
+    await storage.saveSyncFailure(message, cursor);
     throw error;
   }
 }
 
-export async function syncMintHistory(options: { fullBackfill?: boolean } = {}): Promise<SyncResult> {
+export async function syncMintHistory(options: {
+  fullBackfill?: boolean;
+  recentFirst?: boolean;
+} = {}): Promise<SyncResult> {
   if (activeSync) return activeSync;
 
-  activeSync = runSync(options.fullBackfill ? INITIAL_BACKFILL_BLOCKS_PER_RUN : CHUNK_SIZE)
+  activeSync = (async () => {
+    const recentResult = options.recentFirst
+      ? await runSync(RECENT_WINDOW_BLOCKS, { recentFirst: true })
+      : null;
+    const backfillResult = await runSync(
+      options.fullBackfill ? INITIAL_BACKFILL_BLOCKS_PER_RUN : CHUNK_SIZE,
+    );
+    if (!recentResult) return backfillResult;
+    return {
+      running: false,
+      processedFromBlock: backfillResult.processedFromBlock,
+      processedToBlock: recentResult.processedToBlock,
+      chunks: recentResult.chunks + backfillResult.chunks,
+      discovered: recentResult.discovered + backfillResult.discovered,
+      inserted: recentResult.inserted + backfillResult.inserted,
+      hasMoreHistory: backfillResult.hasMoreHistory,
+    };
+  })()
     .finally(() => {
       activeSync = null;
     });
@@ -107,16 +138,18 @@ export async function syncMintHistory(options: { fullBackfill?: boolean } = {}):
 }
 
 export async function getMintSyncStatus() {
-  const [state, eventCount] = await Promise.all([
-    storage.getSyncState(),
+  const [state, recentState, eventCount] = await Promise.all([
+    storage.getSyncState(BACKFILL_CURSOR),
+    storage.getSyncState(RECENT_CURSOR),
     storage.getMintEventCount(),
   ]);
   return {
-    status: activeSync ? "syncing" : state?.lastError ? "error" : "ready",
+    status: activeSync ? "syncing" : state?.lastError || recentState?.lastError ? "error" : "ready",
     eventCount,
     checkpointBlock: state?.lastProcessedBlock ?? null,
-    lastSuccessfulSyncAt: state?.lastSuccessfulSyncAt ?? null,
-    lastAttemptAt: state?.lastAttemptAt ?? null,
-    lastError: state?.lastError ?? null,
+    recentCheckpointBlock: recentState?.lastProcessedBlock ?? null,
+    lastSuccessfulSyncAt: recentState?.lastSuccessfulSyncAt ?? state?.lastSuccessfulSyncAt ?? null,
+    lastAttemptAt: recentState?.lastAttemptAt ?? state?.lastAttemptAt ?? null,
+    lastError: recentState?.lastError ?? state?.lastError ?? null,
   };
 }
