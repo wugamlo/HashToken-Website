@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { syncMintHistory } from "./mint-indexer";
+import { importJsonHistory } from "./import-json-history";
 
 const app = express();
 app.use(express.json());
@@ -66,22 +68,22 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
-    
-    // Set up automatic sync every 5 minutes
-    setInterval(async () => {
+
+    const runIndexer = async (fullBackfill = false) => {
       try {
-        console.log('Running automatic sync...');
-        const response = await fetch('http://localhost:5000/api/contract/auto-sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const result = await response.json();
-        if (result.synced > 0) {
-          console.log(`Auto-sync: ${result.synced} new mint events added`);
+        const result = await syncMintHistory({ fullBackfill });
+        if (result.inserted > 0 || result.hasMoreHistory) {
+          console.log(`Mint indexer: ${result.inserted} events stored through block ${result.processedToBlock}`);
         }
       } catch (error) {
-        console.error('Auto-sync failed:', error);
+        console.error("Mint indexer failed:", error);
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    };
+
+    // Preserve the old local snapshot once, then continue from the durable checkpoint.
+    void importJsonHistory()
+      .catch((error) => console.error("Could not import preserved JSON mining history:", error))
+      .finally(() => void runIndexer());
+    setInterval(() => void runIndexer(), 5 * 60 * 1000);
   });
 })();

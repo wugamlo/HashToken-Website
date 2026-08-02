@@ -35,6 +35,15 @@ interface MintEvent {
   expectedAttempts?: string;
 }
 
+interface SyncStatus {
+  status: "ready" | "syncing" | "error";
+  eventCount: number;
+  checkpointBlock: number | null;
+  lastSuccessfulSyncAt: string | null;
+  lastAttemptAt: string | null;
+  lastError: string | null;
+}
+
 export default function HashTokenInfo() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
@@ -109,6 +118,13 @@ export default function HashTokenInfo() {
     refetchOnMount: true, // Always fetch fresh data on component mount
   });
 
+  const { data: syncStatus, refetch: refetchSyncStatus } = useQuery<SyncStatus>({
+    queryKey: ['/api/contract/sync-status'],
+    queryFn: () => fetch('/api/contract/sync-status').then(res => res.json()),
+    refetchInterval: 60 * 1000,
+    staleTime: 30 * 1000,
+  });
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -132,6 +148,7 @@ export default function HashTokenInfo() {
         refetchHistory(),
         refetchPrice(),
         refetchForecast(),
+        refetchSyncStatus(),
       ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -397,6 +414,24 @@ export default function HashTokenInfo() {
           </CardContent>
         </Card>
       </div>
+
+      {syncStatus && (
+        <Alert variant={syncStatus.status === "error" ? "destructive" : "default"}>
+          <Activity className="h-4 w-4" />
+          <AlertDescription>
+            {syncStatus.status === "error" ? (
+              <>Mining history sync needs attention: {syncStatus.lastError || "The latest indexing attempt failed."}</>
+            ) : syncStatus.status === "syncing" ? (
+              <>Mining history is being synchronized from Ethereum.</>
+            ) : (
+              <>
+                Mining history is stored permanently. {syncStatus.eventCount.toLocaleString()} mint records indexed
+                {syncStatus.lastSuccessfulSyncAt && ` · last synchronized ${formatDistanceToNow(new Date(syncStatus.lastSuccessfulSyncAt), { addSuffix: true })}`}.
+              </>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Educational Content - Moved Below Metrics */}
       <div className="max-w-4xl mx-auto space-y-6">

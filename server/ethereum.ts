@@ -13,6 +13,7 @@ const HASH_TOKEN_ABI = [
 ];
 
 const CONTRACT_ADDRESS = "0xE5544a2A5fA9b175da60D8Eec67adD5582bB31b0";
+export const CONTRACT_DEPLOYMENT_BLOCK = 1_763_185;
 
 // Use free public RPC providers
 const RPC_PROVIDERS = [
@@ -22,15 +23,18 @@ const RPC_PROVIDERS = [
   "https://eth.llamarpc.com",
 ];
 
-let provider: ethers.JsonRpcProvider;
-let contract: ethers.Contract;
+let provider: ethers.JsonRpcProvider | undefined;
+let contract: ethers.Contract | undefined;
+let providerUrl: string | undefined;
 
-export function initializeProvider() {
-  // Try providers in order until one works
+export async function initializeProvider() {
   for (const rpcUrl of RPC_PROVIDERS) {
     try {
-      provider = new ethers.JsonRpcProvider(rpcUrl);
-      contract = new ethers.Contract(CONTRACT_ADDRESS, HASH_TOKEN_ABI, provider);
+      const candidate = new ethers.JsonRpcProvider(rpcUrl);
+      await candidate.getBlockNumber();
+      provider = candidate;
+      contract = new ethers.Contract(CONTRACT_ADDRESS, HASH_TOKEN_ABI, candidate);
+      providerUrl = rpcUrl;
       console.log(`Connected to Ethereum via ${rpcUrl}`);
       return true;
     } catch (error) {
@@ -43,20 +47,42 @@ export function initializeProvider() {
   return false;
 }
 
-export async function getCurrentContractState() {
-  if (!contract) {
-    throw new Error("Contract not initialized");
-  }
+async function withProviderFailover<T>(action: (activeProvider: ethers.JsonRpcProvider, activeContract: ethers.Contract) => Promise<T>): Promise<T> {
+  const orderedProviders = providerUrl
+    ? [providerUrl, ...RPC_PROVIDERS.filter((url) => url !== providerUrl)]
+    : RPC_PROVIDERS;
+  let lastError: unknown;
 
+  for (const rpcUrl of orderedProviders) {
+    try {
+      const candidate = new ethers.JsonRpcProvider(rpcUrl);
+      const candidateContract = new ethers.Contract(CONTRACT_ADDRESS, HASH_TOKEN_ABI, candidate);
+      const result = await action(candidate, candidateContract);
+      provider = candidate;
+      contract = candidateContract;
+      providerUrl = rpcUrl;
+      return result;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Ethereum RPC ${rpcUrl} failed; trying next provider.`, error);
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("No Ethereum RPC provider is available");
+}
+
+export async function getCurrentContractState() {
   try {
-    const [maxValue, prevHash, currentBlock] = await Promise.all([
-      contract.max_value(),
-      contract.prev_hash(),
-      provider.getBlockNumber()
-    ]);
+    const { maxValue, prevHash, currentBlock, totalSupply } = await withProviderFailover(async (activeProvider, activeContract) => {
+      const [maxValue, prevHash, currentBlock, totalSupply] = await Promise.all([
+        activeContract.max_value(),
+        activeContract.prev_hash(),
+        activeProvider.getBlockNumber(),
+        activeContract.totalSupply(),
+      ]);
+      return { maxValue, prevHash, currentBlock, totalSupply };
+    });
 
     // Get total supply from contract - but this might return 0 for this historical contract
-    const totalSupply = await contract.totalSupply();
     let mintCount = Number(totalSupply) / 1e18;
     
     // If totalSupply is 0, fall back to counting mint events in our database
@@ -78,63 +104,49 @@ export async function getCurrentContractState() {
   }
 }
 
-export async function getRecentMintEvents(fromBlock: number = -50000) {
-  if (!contract) {
-    throw new Error("Contract not initialized");
-  }
+export type ChainMintEvent = {
+  blockNumber: number;
+  transactionHash: string;
+  minter: string;
+  timestamp: Date;
+  gasUsed: string;
+  gasPrice: string;
+};
 
-  try {
-    const currentBlock = await provider.getBlockNumber();
-    const startBlock = fromBlock < 0 ? Math.max(0, currentBlock + fromBlock) : fromBlock;
-    
-    console.log(`Fetching mint events from block ${startBlock} to ${currentBlock}`);
-    
-    const filter = contract.filters.Mint();
-    const events = await contract.queryFilter(filter, startBlock, currentBlock);
-    
-    console.log(`Found ${events.length} mint events`);
-    
-    const mintEvents = await Promise.all(
-      events.map(async (event) => {
-        const block = await provider.getBlock(event.blockNumber);
-        const tx = await provider.getTransaction(event.transactionHash);
-        const receipt = await provider.getTransactionReceipt(event.transactionHash);
-        
-        // Validate this is actually a mint transaction to HashToken contract
-        const isValidMint = tx?.to?.toLowerCase() === '0xe5544a2a5fa9b175da60d8eec67add5582bb31b0';
-        
-        if (!isValidMint) {
-          console.log(`Skipping invalid mint transaction: ${event.transactionHash}`);
-          return null;
-        }
-        
-        return {
-          blockNumber: event.blockNumber,
-          transactionHash: event.transactionHash,
-          minter: event.args?.[0] || "",
-          timestamp: new Date(block!.timestamp * 1000),
-          gasUsed: receipt?.gasUsed?.toString() || "",
-          gasPrice: tx?.gasPrice?.toString() || "",
-        };
-      })
-    );
+export async function getLatestBlockNumber() {
+  return withProviderFailover((activeProvider) => activeProvider.getBlockNumber());
+}
 
-    // Filter out null entries (invalid transactions)
-    const validMintEvents = mintEvents.filter(event => event !== null);
-    console.log(`Filtered to ${validMintEvents.length} valid mint events`);
-    
-    return validMintEvents.sort((a, b) => b.blockNumber - a.blockNumber);
-  } catch (error) {
-    console.error("Error fetching mint events:", error);
-    throw error;
-  }
+export async function fetchMintEvents(fromBlock: number, toBlock: number): Promise<ChainMintEvent[]> {
+  return withProviderFailover(async (activeProvider, activeContract) => {
+    const filter = activeContract.filters.Mint();
+    const events = await activeContract.queryFilter(filter, fromBlock, toBlock);
+    const mintEvents = await Promise.all(events.map(async (event) => {
+      const [block, tx, receipt] = await Promise.all([
+        activeProvider.getBlock(event.blockNumber),
+        activeProvider.getTransaction(event.transactionHash),
+        activeProvider.getTransactionReceipt(event.transactionHash),
+      ]);
+      if (!block || tx?.to?.toLowerCase() !== CONTRACT_ADDRESS.toLowerCase()) return null;
+      return {
+        blockNumber: event.blockNumber,
+        transactionHash: event.transactionHash,
+        minter: String((event as ethers.EventLog).args?.[0] ?? ""),
+        timestamp: new Date(block.timestamp * 1000),
+        gasUsed: receipt?.gasUsed?.toString() ?? "",
+        gasPrice: tx?.gasPrice?.toString() ?? "",
+      };
+    }));
+    return mintEvents.filter((event): event is ChainMintEvent => event !== null)
+      .sort((a, b) => a.blockNumber - b.blockNumber);
+  });
 }
 
 export function calculateSupplyFromMaxValue(maxValue: string): number {
   try {
     const currentMaxValue = BigInt(maxValue);
     // From contract: max_value = 2 ** 255 (line 61 in contract)
-    const initialMaxValue = BigInt(2) ** BigInt(255);
+    const initialMaxValue = BigInt(1) << BigInt(255);
     
     // Each mint reduces max_value by 1% (multiplies by 0.99)
     // So: current_max_value = initial_max_value * (0.99)^supply

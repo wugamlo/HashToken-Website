@@ -76,8 +76,8 @@ export class HashCalculator {
       }
       
       // Convert hex strings to Uint8Array (browser-compatible)
-      const valueBytes = new Uint8Array(valueHex.match(/.{2}/g).map(byte => parseInt(byte, 16)));
-      const prevHashBytes = new Uint8Array(prevHashHex.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+      const valueBytes = new Uint8Array((valueHex.match(/.{2}/g) ?? []).map(byte => parseInt(byte, 16)));
+      const prevHashBytes = new Uint8Array((prevHashHex.match(/.{2}/g) ?? []).map(byte => parseInt(byte, 16)));
       
       // Concatenate bytes (value + prevHash as per contract sha3(value, prev_hash))
       const combined = new Uint8Array(valueBytes.length + prevHashBytes.length);
@@ -93,7 +93,7 @@ export class HashCalculator {
     }
   }
 
-  private isValidSolution(calculatedHash: string, maxValue: BigInt): boolean {
+  private isValidSolution(calculatedHash: string, maxValue: bigint): boolean {
     try {
       // Convert hash to BigInt for comparison
       const hashValue = BigInt(calculatedHash);
@@ -185,7 +185,7 @@ export class HashCalculator {
       console.log('Expected attempts (billions):', (expectedAttempts / 1e9).toFixed(1), 'billion');
     } catch (error) {
       console.error('Parameter parsing error:', error);
-      throw new Error(`Invalid parameters: ${error.message}`);
+      throw new Error(`Invalid parameters: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     // Start calculation loop

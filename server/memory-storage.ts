@@ -101,6 +101,10 @@ export class MemoryStorage implements IStorage {
     const newEvent: MintEvent = {
       id: this.data.nextIds.mintEvents++,
       ...event,
+      gasUsed: event.gasUsed ?? null,
+      gasPrice: event.gasPrice ?? null,
+      difficulty: event.difficulty ?? null,
+      expectedAttempts: event.expectedAttempts ?? null,
     };
     this.data.mintEvents.push(newEvent);
     this.saveToFile();
@@ -112,6 +116,10 @@ export class MemoryStorage implements IStorage {
     const newEvents: MintEvent[] = events.map(event => ({
       id: this.data.nextIds.mintEvents++,
       ...event,
+      gasUsed: event.gasUsed ?? null,
+      gasPrice: event.gasPrice ?? null,
+      difficulty: event.difficulty ?? null,
+      expectedAttempts: event.expectedAttempts ?? null,
     }));
     this.data.mintEvents.push(...newEvents);
     this.saveToFile();
@@ -120,6 +128,30 @@ export class MemoryStorage implements IStorage {
 
   async getMintEventByHash(hash: string): Promise<MintEvent | undefined> {
     return this.data.mintEvents.find(event => event.transactionHash === hash);
+  }
+
+  async insertMintEvents(events: InsertMintEvent[]): Promise<number> {
+    const newEvents = events.filter((event) => !this.data.mintEvents.some(
+      (existing) => existing.transactionHash === event.transactionHash,
+    ));
+    await this.insertMintEventsBatch(newEvents);
+    return newEvents.length;
+  }
+
+  async getMintEventCount(): Promise<number> {
+    return this.data.mintEvents.length;
+  }
+
+  async getSyncState() {
+    return undefined;
+  }
+
+  async saveSyncSuccess(): Promise<never> {
+    throw new Error("MemoryStorage does not support durable sync checkpoints");
+  }
+
+  async saveSyncFailure(): Promise<void> {
+    // Kept only for backwards compatibility; MemoryStorage is no longer active.
   }
 
   // Utility methods for data migration
