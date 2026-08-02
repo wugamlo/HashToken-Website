@@ -142,6 +142,14 @@ export class MemoryStorage implements IStorage {
     return this.data.mintEvents.length;
   }
 
+  async getEarliestMintBlock(): Promise<number | undefined> {
+    if (!this.data.mintEvents.length) return undefined;
+    return this.data.mintEvents.reduce(
+      (minimum, event) => Math.min(minimum, event.blockNumber),
+      Number.MAX_SAFE_INTEGER,
+    );
+  }
+
   async getSyncState() {
     return undefined;
   }

@@ -1,6 +1,6 @@
 import { type User, type InsertUser, type MintEvent, type InsertMintEvent, type SyncState, users, mintEvents, syncStates } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, gte, lte } from "drizzle-orm";
+import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -14,6 +14,7 @@ export interface IStorage {
   insertMintEvents(events: InsertMintEvent[]): Promise<number>;
   getMintEventByHash(hash: string): Promise<MintEvent | undefined>;
   getMintEventCount(): Promise<number>;
+  getEarliestMintBlock(): Promise<number | undefined>;
   getSyncState(chain?: string): Promise<SyncState | undefined>;
   saveSyncSuccess(lastProcessedBlock: number, chain?: string): Promise<SyncState>;
   saveSyncFailure(message: string, chain?: string): Promise<void>;
@@ -88,8 +89,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMintEventCount(): Promise<number> {
-    const events = await db.select({ id: mintEvents.id }).from(mintEvents);
-    return events.length;
+    const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(mintEvents);
+    return row?.count ?? 0;
+  }
+
+  async getEarliestMintBlock(): Promise<number | undefined> {
+    const [row] = await db
+      .select({ min: sql<number | null>`min(${mintEvents.blockNumber})::int` })
+      .from(mintEvents);
+    return row?.min ?? undefined;
   }
 
   async getSyncState(chain: string = "ethereum-mainnet"): Promise<SyncState | undefined> {

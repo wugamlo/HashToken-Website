@@ -1,0 +1,1 @@
+- [Free Ethereum RPC limits](free-eth-rpc-limits.md) — no batching, ≤750-block log ranges, no archive queries; destroy failed ethers providers; three independent sync cursors.

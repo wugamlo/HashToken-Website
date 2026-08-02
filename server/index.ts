@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { syncMintHistory } from "./mint-indexer";
 import { importJsonHistory } from "./import-json-history";
+import { ensureSchema } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -80,8 +81,11 @@ app.use((req, res, next) => {
       }
     };
 
-    // Preserve the old local snapshot once, then continue from the durable checkpoint.
-    void importJsonHistory()
+    // Provision tables if missing, preserve the old local snapshot once,
+    // then continue from the durable checkpoint.
+    void ensureSchema()
+      .catch((error) => console.error("Could not provision database schema:", error))
+      .then(() => importJsonHistory())
       .catch((error) => console.error("Could not import preserved JSON mining history:", error))
       .finally(() => void runIndexer());
     setInterval(() => void runIndexer(), 5 * 60 * 1000);

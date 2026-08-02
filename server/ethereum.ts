@@ -30,7 +30,7 @@ let providerUrl: string | undefined;
 export async function initializeProvider() {
   for (const rpcUrl of RPC_PROVIDERS) {
     try {
-      const candidate = new ethers.JsonRpcProvider(rpcUrl);
+      const candidate = createProvider(rpcUrl);
       await candidate.getBlockNumber();
       provider = candidate;
       contract = new ethers.Contract(CONTRACT_ADDRESS, HASH_TOKEN_ABI, candidate);
@@ -47,6 +47,15 @@ export async function initializeProvider() {
   return false;
 }
 
+function createProvider(rpcUrl: string): ethers.JsonRpcProvider {
+  // staticNetwork avoids eth_chainId detection loops; batchMaxCount 1 keeps free
+  // providers from rejecting batched requests ("too many RPC calls in batch request").
+  return new ethers.JsonRpcProvider(rpcUrl, undefined, {
+    staticNetwork: ethers.Network.from("mainnet"),
+    batchMaxCount: 1,
+  });
+}
+
 async function withProviderFailover<T>(action: (activeProvider: ethers.JsonRpcProvider, activeContract: ethers.Contract) => Promise<T>): Promise<T> {
   const orderedProviders = providerUrl
     ? [providerUrl, ...RPC_PROVIDERS.filter((url) => url !== providerUrl)]
@@ -54,17 +63,20 @@ async function withProviderFailover<T>(action: (activeProvider: ethers.JsonRpcPr
   let lastError: unknown;
 
   for (const rpcUrl of orderedProviders) {
+    const candidate = createProvider(rpcUrl);
     try {
-      const candidate = new ethers.JsonRpcProvider(rpcUrl);
       const candidateContract = new ethers.Contract(CONTRACT_ADDRESS, HASH_TOKEN_ABI, candidate);
       const result = await action(candidate, candidateContract);
+      if (provider && provider !== candidate) provider.destroy();
       provider = candidate;
       contract = candidateContract;
       providerUrl = rpcUrl;
       return result;
     } catch (error) {
+      candidate.destroy();
       lastError = error;
-      console.warn(`Ethereum RPC ${rpcUrl} failed; trying next provider.`, error);
+      const message = error instanceof Error ? error.message.split("\n")[0].slice(0, 200) : String(error);
+      console.warn(`Ethereum RPC ${rpcUrl} failed; trying next provider. ${message}`);
     }
   }
   throw lastError instanceof Error ? lastError : new Error("No Ethereum RPC provider is available");
@@ -119,25 +131,32 @@ export async function getLatestBlockNumber() {
 
 export async function fetchMintEvents(fromBlock: number, toBlock: number): Promise<ChainMintEvent[]> {
   return withProviderFailover(async (activeProvider, activeContract) => {
+    // The log filter is already scoped to the HashToken contract and Mint topic,
+    // so no per-transaction validation calls are needed. Only block timestamps
+    // are fetched, sequentially, to stay within free-provider rate limits.
     const filter = activeContract.filters.Mint();
     const events = await activeContract.queryFilter(filter, fromBlock, toBlock);
-    const mintEvents = await Promise.all(events.map(async (event) => {
-      const [block, tx, receipt] = await Promise.all([
-        activeProvider.getBlock(event.blockNumber),
-        activeProvider.getTransaction(event.transactionHash),
-        activeProvider.getTransactionReceipt(event.transactionHash),
-      ]);
-      if (!block || tx?.to?.toLowerCase() !== CONTRACT_ADDRESS.toLowerCase()) return null;
-      return {
-        blockNumber: event.blockNumber,
-        transactionHash: event.transactionHash,
-        minter: String((event as ethers.EventLog).args?.[0] ?? ""),
-        timestamp: new Date(block.timestamp * 1000),
-        gasUsed: receipt?.gasUsed?.toString() ?? "",
-        gasPrice: tx?.gasPrice?.toString() ?? "",
-      };
-    }));
-    return mintEvents.filter((event): event is ChainMintEvent => event !== null)
+
+    const blockTimestamps = new Map<number, Date>();
+    for (const blockNumber of Array.from(new Set(events.map((event) => event.blockNumber)))) {
+      const block = await activeProvider.getBlock(blockNumber);
+      if (block) blockTimestamps.set(blockNumber, new Date(block.timestamp * 1000));
+    }
+
+    return events
+      .map((event) => {
+        const timestamp = blockTimestamps.get(event.blockNumber);
+        if (!timestamp) return null;
+        return {
+          blockNumber: event.blockNumber,
+          transactionHash: event.transactionHash,
+          minter: String((event as ethers.EventLog).args?.[0] ?? ""),
+          timestamp,
+          gasUsed: "",
+          gasPrice: "",
+        };
+      })
+      .filter((event): event is ChainMintEvent => event !== null)
       .sort((a, b) => a.blockNumber - b.blockNumber);
   });
 }
