@@ -752,49 +752,57 @@ export default function HashTokenInfo() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : mintEvents && mintEvents.length > 0 ? (
-                <div className="space-y-4">
+                <div className="mx-auto w-full max-w-4xl">
+                  <div className="mb-2 hidden grid-cols-[minmax(0,1fr)_auto_auto] gap-6 px-4 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground md:grid">
+                    <span>Mint event</span>
+                    <span className="text-right">Estimated work</span>
+                    <span className="text-right">Miner / transaction</span>
+                  </div>
+                  <div className="divide-y rounded-lg border bg-muted/10">
                   {mintEvents.map((event, eventIndex) => {
                     const estimatedAttempts = getEstimatedAttempts(event, eventIndex);
                     return (
-                    <div key={event.id} className="border rounded-lg px-4 py-3">
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
-                        <div className="flex min-w-0 items-center gap-2">
+                    <div key={event.id} className="px-4 py-3 transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-muted/30">
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:gap-6">
+                        <div className="flex min-w-0 items-center gap-2.5">
                           <Badge variant="outline" className="shrink-0">
                             Block {event.blockNumber.toLocaleString()}
                           </Badge>
-                          <span className="truncate text-sm text-muted-foreground">
+                          <span className="truncate text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
                           </span>
                         </div>
-                        <div className="min-w-0 md:text-right">
+                        <div className="flex items-center justify-between gap-3 md:block md:min-w-[88px] md:text-right">
                           <div className="text-xs text-muted-foreground">Estimated attempts</div>
-                          <div className="font-semibold text-red-500">
+                          <div className="rounded-md bg-red-500/10 px-2 py-1 font-semibold text-red-500 md:mt-1 md:inline-block">
                             {estimatedAttempts ? formatExpectedAttempts(estimatedAttempts) : 'N/A'}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between gap-4 md:justify-end">
+                        <div className="flex min-w-0 items-center justify-between gap-3 md:justify-end">
                           <a
                             href={`https://etherscan.io/address/${event.minter}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             title={event.minter}
-                            className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+                            className="truncate text-xs text-muted-foreground hover:text-foreground hover:underline"
                           >
-                            Miner {formatMinerAddress(event.minter)}
+                            {formatMinerAddress(event.minter)}
                           </a>
                           <a
                             href={`https://etherscan.io/tx/${event.transactionHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="shrink-0 text-sm text-blue-500 hover:underline"
+                            className="flex shrink-0 items-center gap-1 text-xs text-blue-500 hover:underline"
                           >
-                            Etherscan
+                            <ExternalLink className="h-3 w-3" />
+                            Tx
                           </a>
                         </div>
                       </div>
                     </div>
                     );
                   })}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
