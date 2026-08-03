@@ -29,8 +29,6 @@ interface MintEvent {
   transactionHash: string;
   minter: string;
   timestamp: string;
-  gasUsed?: string;
-  gasPrice?: string;
   difficulty?: string;
   expectedAttempts?: string;
 }
@@ -205,6 +203,24 @@ export default function HashTokenInfo() {
     } catch {
       return attempts;
     }
+  };
+
+  const formatMinerAddress = (address: string): string => {
+    if (address.length < 14) return address;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const getEstimatedAttempts = (event: MintEvent, eventIndex: number): string | null => {
+    if (event.expectedAttempts) return event.expectedAttempts;
+    if (!contractState?.expectedAttempts) return null;
+
+    const currentAttempts = Number.parseFloat(contractState.expectedAttempts);
+    if (!Number.isFinite(currentAttempts)) return null;
+
+    // Each successful mint increases the expected work by about 1%. The API
+    // returns newest-first, so step backward from the current next-mint value.
+    const estimatedAttempts = currentAttempts / Math.pow(1.01, eventIndex + 1);
+    return estimatedAttempts.toExponential();
   };
 
   const getDifficultyColor = (difficulty: string): string => {
@@ -726,7 +742,9 @@ export default function HashTokenInfo() {
           <Card>
             <CardHeader>
               <CardTitle>Mining History</CardTitle>
-              <CardDescription>Recent mining events from the HashToken contract</CardDescription>
+              <CardDescription>
+                Recent mining events · estimated attempts are probability-based, not an exact count of failed hashes
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {eventsLoading ? (
@@ -735,34 +753,48 @@ export default function HashTokenInfo() {
                 </div>
               ) : mintEvents && mintEvents.length > 0 ? (
                 <div className="space-y-4">
-                  {mintEvents.map((event) => (
-                    <div key={event.id} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="outline">Block {event.blockNumber.toLocaleString()}</Badge>
-                          <span className="text-sm text-muted-foreground">
+                  {mintEvents.map((event, eventIndex) => {
+                    const estimatedAttempts = getEstimatedAttempts(event, eventIndex);
+                    return (
+                    <div key={event.id} className="border rounded-lg px-4 py-3">
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <Badge variant="outline" className="shrink-0">
+                            Block {event.blockNumber.toLocaleString()}
+                          </Badge>
+                          <span className="truncate text-sm text-muted-foreground">
                             {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
                           </span>
                         </div>
-                        <a 
-                          href={`https://etherscan.io/tx/${event.transactionHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline text-sm"
-                        >
-                          View on Etherscan
-                        </a>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium">Miner:</span> {event.minter}
+                        <div className="min-w-0 md:text-right">
+                          <div className="text-xs text-muted-foreground">Estimated attempts</div>
+                          <div className="font-semibold text-red-500">
+                            {estimatedAttempts ? formatExpectedAttempts(estimatedAttempts) : 'N/A'}
+                          </div>
                         </div>
-                        <div>
-                          <span className="font-medium">Gas Used:</span> {event.gasUsed || 'N/A'}
+                        <div className="flex items-center justify-between gap-4 md:justify-end">
+                          <a
+                            href={`https://etherscan.io/address/${event.minter}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={event.minter}
+                            className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+                          >
+                            Miner {formatMinerAddress(event.minter)}
+                          </a>
+                          <a
+                            href={`https://etherscan.io/tx/${event.transactionHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-sm text-blue-500 hover:underline"
+                          >
+                            Etherscan
+                          </a>
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8">
